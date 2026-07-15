@@ -1,0 +1,41 @@
+backend = "kmeans"
+palette = "dark16"
+check_contrast = true
+
+[templates]
+
+waybar.template = "waybar.css.j2"
+waybar.target = "~/.config/waybar/style.css"
+
+waybar_config.template = "waybar-config.jsonc.j2"
+waybar_config.target = "~/.config/waybar/config.jsonc"
+
+swaync.template = "swaync.css.j2"
+swaync.target = "~/.config/swaync/style.css"
+
+wlogout.template = "wlogout.css.j2"
+wlogout.target = "~/.config/wlogout/style.css"
+
+hypr.template = "hypr-colors.lua.j2"
+hypr.target = "~/.config/hypr/colors.lua"
+
+kitty.template = "kitty-colors.conf.j2"
+kitty.target = "~/.config/kitty/colors.conf"
+
+cava.template = "cava-colors.j2"
+cava.target = "~/.config/cava/themes/generated"
+
+rofi.template = "rofi-colors.rasi.j2"
+rofi.target = "~/.config/rofi/theme-generated.rasi"
+
+env.template = "wallust-env.j2"
+env.target = "~/.config/wallust/env"
+
+browser_colors.template = "browser-colors.css.j2"
+browser_colors.target = "~/.config/wallust/browser-colors.css"
+
+wallpaper_grid.template = "wallpaper-grid.rasi.j2"
+wallpaper_grid.target = "~/.config/rofi/themes/wallpaper-grid.rasi"
+
+power.template = "power.rasi.j2"
+power.target = "~/.config/rofi/themes/power.rasi"

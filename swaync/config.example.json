@@ -1,0 +1,92 @@
+{
+  "$schema": "/etc/xdg/swaync/configSchema.json",
+
+  "ignore-gtk-theme": true,
+  "cssPriority": "user",
+
+  "positionX": "right",
+  "positionY": "top",
+  "layer": "overlay",
+
+  "fit-to-screen": false,
+  "transition-time": 200,
+  "hide-on-clear": false,
+
+  "control-center-width": 340,
+  "control-center-height": 700,
+  "control-center-margin-top": 8,
+  "control-center-margin-bottom": 8,
+  "control-center-margin-right": 8,
+
+  "widgets": [
+    "title",
+    "mpris",
+    "volume",
+    "backlight",
+    "buttons-grid",
+    "dnd",
+    "notifications"
+  ],
+
+  "widget-config": {
+    "title": {
+      "text": "♪ Notificaciones",
+      "button-text": "Limpiar"
+    },
+
+    "mpris": {
+      "autohide": true,
+      "show-album-art": "always",
+      "image-size": 64,
+      "image-radius": 8
+    },
+
+    "volume": {
+      "label": "󰕾",
+      "show-per-app": true
+    },
+
+    "backlight": {
+      "label": "󰃟",
+      "device": "intel_backlight"
+    },
+
+    "dnd": {
+      "text": "No Molestar"
+    },
+
+    "buttons-grid": {
+      "buttons-per-row": 4,
+      "actions": [
+        {
+          "label": "󰖩",
+          "type": "toggle",
+          "active": true,
+          "command": "sh -c '[[ $SWAYNC_TOGGLE_STATE == true ]] && nmcli radio wifi on || nmcli radio wifi off'",
+          "update-command": "sh -c '[[ $(nmcli r wifi) == \"enabled\" ]] && echo true || echo false'"
+        },
+        {
+          "label": "󰂯",
+          "type": "toggle",
+          "active": false,
+          "command": "sh -c 'if [[ $SWAYNC_TOGGLE_STATE == true ]]; then rfkill unblock bluetooth; bluetoothctl power on; else rfkill block bluetooth; fi'",
+          "update-command": "/home/lucario/.config/swaync/bt-status.sh"
+        },
+        {
+          "label": "󰍭",
+          "type": "toggle",
+          "active": false,
+          "command": "sh -c '[[ $SWAYNC_TOGGLE_STATE == true ]] && pactl set-source-mute @DEFAULT_SOURCE@ 1 || pactl set-source-mute @DEFAULT_SOURCE@ 0'",
+          "update-command": "sh -c '[[ $(pactl get-source-mute @DEFAULT_SOURCE@) == *yes* ]] && echo true || echo false'"
+        },
+        {
+          "label": "󰝟",
+          "type": "toggle",
+          "active": false,
+          "command": "sh -c '[[ $SWAYNC_TOGGLE_STATE == true ]] && pactl set-sink-mute @DEFAULT_SINK@ 1 || pactl set-sink-mute @DEFAULT_SINK@ 0'",
+          "update-command": "sh -c '[[ $(pactl get-sink-mute @DEFAULT_SINK@) == *yes* ]] && echo true || echo false'"
+        }
+      ]
+    }
+  }
+}

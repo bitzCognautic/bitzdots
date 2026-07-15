@@ -1,0 +1,24 @@
+(defpoll ws_list :interval "0.2s" :initial "[]"
+  "/home/bitz/.config/eww/scripts/workspaces.sh")
+
+(defwidget workspace-button [ws]
+  (eventbox :onclick "${ws.onclick}"
+    (label :text "${ws.display}"
+           :class "ws-label ${ws.class}")))
+
+(defwidget workspace-bar []
+  (box :class "workspace-bar"
+    (for entry in ws_list
+      (workspace-button :ws entry))))
+
+(defwindow workspaces
+  :monitor 0
+  :geometry (geometry :x "0%"
+                      :y "0px"
+                      :width "280px"
+                      :height "26px"
+                      :anchor "top left")
+  :stacking "overlay"
+  :namespace "eww-workspace"
+  :focusable false
+  (workspace-bar))

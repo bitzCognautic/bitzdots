@@ -1,0 +1,8 @@
+require("variables")
+require("monitors")
+require("input")
+require("appearance")
+require("animations")
+require("keybinds")
+require("rules")
+require("autostart")

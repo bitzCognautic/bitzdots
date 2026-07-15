@@ -1,0 +1,328 @@
+/* ╔══════════════════════════════════════════════════════╗ */
+/* ║       KASANE TETO — Waybar Theme                     ║ */
+/* ║       inspired by her drill-twin-tails & uniform     ║ */
+/* ╚══════════════════════════════════════════════════════╝ */
+
+/* ─── Palette (from image sampling) ──────────────────── */
+/*   hair vivid   : #cd5f78   uniform gray : #bcb7bb      */
+/*   hair dark    : #7b323d   skin/cheek   : #f1d1c5      */
+/*   bg image     : #fec8be   uniform mid  : #9c8682      */
+
+/* Backgrounds — derivados del vino oscuro del cabello */
+@define-color background              #160d11;
+@define-color surface                 #160d11;
+@define-color surface_container       #261420;
+@define-color surface_container_high  #35182c;
+@define-color surface_container_highest #462038;
+@define-color surface_container_low   #1d1018;
+@define-color surface_bright          #5c3448;
+
+/* Foreground — desde piel/mejilla y crema de la imagen */
+@define-color on_surface              #f8e4df;   /* crema cálida */
+@define-color on_surface_variant      #d4a8a2;   /* melocotón apagado */
+@define-color inverse_surface         #f8e4df;
+
+/* Primary — cabello rosa vivo de la imagen */
+@define-color primary                 #d46478;   /* #cd5f78 levemente saturado */
+@define-color primary_fixed           #a84060;   /* entre vivid y vino */
+@define-color primary_fixed_dim       #7b323d;   /* vino oscuro del pelo */
+@define-color on_primary              #160d11;
+
+/* Secondary — uniforme gris de la imagen */
+@define-color secondary               #bcb7bb;   /* gris neutro uniforme */
+@define-color on_secondary            #160d11;
+@define-color secondary_container     #35182c;
+@define-color on_secondary_container  #f8e4df;
+@define-color on_secondary_fixed_variant #9c8682; /* gris medio uniforme */
+
+/* Tertiary — punto medio entre cabello y uniforme */
+@define-color tertiary                #c07890;
+@define-color on_tertiary             #160d11;
+
+/* Error — rojo acento (derivado del vino + saturación) */
+@define-color error                   #c43050;
+@define-color on_error                #f8e4df;
+
+/* Outline */
+@define-color outline                 #6e4450;
+@define-color outline_variant         #261420;
+
+/* ─── Reset ───────────────────────────────────────────── */
+* {
+  border: none;
+  border-radius: 0;
+  font-family: "Noto Sans CJK JP", "Iosevka", monospace;
+  font-size: 13px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── Bar ─────────────────────────────────────────────── */
+window#waybar {
+  background: @background;
+  border-bottom: 1px solid @outline_variant;
+  color: @on_surface;
+}
+
+/* Subtle shimmer at the bottom edge */
+window#waybar > box {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    alpha(@primary, 0.04) 100%
+  );
+}
+
+/* ─── Workspaces ──────────────────────────────────────── */
+#workspaces {
+  background: @surface_container_low;
+  border-radius: 0 8px 8px 0;
+  margin: 4px 6px 4px 0;
+  padding: 0 4px;
+  border: 1px solid @outline_variant;
+  border-left: none;
+}
+
+#workspaces button {
+  background: transparent;
+  color: @on_surface_variant;
+  border-radius: 6px;
+  padding: 3px 10px;
+  margin: 2px 1px;
+  transition: all 180ms ease;
+  font-size: 12px;
+}
+
+#workspaces button:hover {
+  background: @surface_container_high;
+  color: @primary;
+  box-shadow: inset 0 -2px 0 @primary;
+}
+
+#workspaces button.active {
+  background: alpha(@primary, 0.18);
+  color: @primary;
+  box-shadow: inset 0 -2px 0 @primary;
+  font-weight: bold;
+}
+
+#workspaces button.urgent {
+  background: alpha(@error, 0.25);
+  color: @error;
+  box-shadow: inset 0 -2px 0 @error;
+}
+
+/* ─── Window title ────────────────────────────────────── */
+#window {
+  color: @on_surface_variant;
+  font-style: italic;
+  padding: 0 12px;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Generic module base ─────────────────────────────── */
+.modules-right > widget > * {
+  margin: 4px 2px;
+}
+
+/* ─── Module pill helper ──────────────────────────────── */
+#clock,
+#battery,
+#cpu,
+#memory,
+#temperature,
+#disk,
+#network,
+#pulseaudio,
+#wireplumber,
+#bluetooth,
+#backlight,
+#idle_inhibitor,
+#tray,
+#mpris,
+#custom-launcher,
+#custom-power,
+#custom-music {
+  background: @surface_container;
+  color: @on_surface;
+  border-radius: 8px;
+  padding: 2px 12px;
+  margin: 4px 2px;
+  border: 1px solid @outline_variant;
+  transition: all 180ms ease;
+}
+
+/* hover glow */
+#clock:hover,
+#battery:hover,
+#cpu:hover,
+#memory:hover,
+#temperature:hover,
+#disk:hover,
+#network:hover,
+#pulseaudio:hover,
+#wireplumber:hover,
+#bluetooth:hover,
+#backlight:hover,
+#idle_inhibitor:hover {
+  background: @surface_container_high;
+  border-color: @outline;
+  color: @primary;
+}
+
+/* ─── Clock — signature pink ──────────────────────────── */
+#clock {
+  background: alpha(@primary, 0.15);
+  color: @primary;
+  border-color: alpha(@primary, 0.4);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 2px 16px;
+}
+
+/* ─── Battery ─────────────────────────────────────────── */
+#battery.charging,
+#battery.plugged {
+  color: @tertiary;
+  border-color: alpha(@tertiary, 0.45);
+  background: alpha(@tertiary, 0.12);
+}
+
+#battery.warning:not(.charging) {
+  color: @primary_fixed;
+  border-color: alpha(@primary_fixed, 0.5);
+  animation: battery-pulse 2s ease-in-out infinite;
+}
+
+#battery.critical:not(.charging) {
+  color: @error;
+  border-color: alpha(@error, 0.55);
+  animation: battery-pulse 0.8s ease-in-out infinite;
+}
+
+@keyframes battery-pulse {
+  0%, 100% { background: @surface_container; }
+  50%       { background: alpha(@error, 0.18); }
+}
+
+/* ─── CPU ─────────────────────────────────────────────── */
+#cpu {
+  color: @secondary;
+}
+#cpu.warning  { color: @primary_fixed; }
+#cpu.critical { color: @error; }
+
+/* ─── Memory ──────────────────────────────────────────── */
+#memory { color: @on_secondary_container; }
+
+/* ─── Network ─────────────────────────────────────────── */
+#network.disconnected {
+  color: @error;
+  border-color: alpha(@error, 0.4);
+}
+#network.linked,
+#network.ethernet {
+  color: @tertiary;
+}
+
+/* ─── Audio ───────────────────────────────────────────── */
+#pulseaudio,
+#wireplumber {
+  color: @on_surface_variant;
+}
+#pulseaudio.muted,
+#wireplumber.muted {
+  color: @surface_bright;
+  border-color: alpha(@surface_bright, 0.3);
+}
+
+/* ─── Bluetooth ───────────────────────────────────────── */
+#bluetooth.connected {
+  color: @primary;
+  border-color: alpha(@primary, 0.4);
+}
+#bluetooth.disabled {
+  color: @surface_bright;
+}
+
+/* ─── Idle inhibitor ──────────────────────────────────── */
+#idle_inhibitor.activated {
+  color: @primary_fixed;
+  border-color: alpha(@primary_fixed, 0.45);
+  background: alpha(@primary_fixed, 0.15);
+}
+
+/* ─── Mpris / music ───────────────────────────────────── */
+#mpris,
+#custom-music {
+  color: @tertiary;
+  border-color: alpha(@tertiary, 0.4);
+  background: alpha(@tertiary, 0.1);
+  max-width: 220px;
+  overflow: hidden;
+}
+
+/* ─── Temperature ─────────────────────────────────────── */
+#temperature.critical {
+  color: @error;
+  border-color: alpha(@error, 0.5);
+  animation: battery-pulse 1s ease-in-out infinite;
+}
+
+/* ─── Tray ────────────────────────────────────────────── */
+#tray {
+  padding: 2px 8px;
+}
+#tray > .passive  { -gtk-icon-effect: dim; }
+#tray > .needs-attention {
+  -gtk-icon-effect: highlight;
+  background: alpha(@primary_fixed, 0.2);
+  border-color: @primary_fixed;
+}
+
+/* ─── Custom launcher (left pill) ────────────────────── */
+#custom-launcher {
+  color: @primary;
+  border-color: alpha(@primary, 0.5);
+  background: alpha(@primary, 0.15);
+  border-radius: 0 8px 8px 0;
+  margin-left: 0;
+  padding: 2px 14px 2px 10px;
+  font-size: 15px;
+}
+#custom-launcher:hover {
+  background: alpha(@primary, 0.28);
+  color: @on_surface;
+}
+
+/* ─── Custom power (right pill) ──────────────────────── */
+#custom-power {
+  color: @error;
+  border-color: alpha(@error, 0.45);
+  background: alpha(@error, 0.12);
+  border-radius: 8px 0 0 8px;
+  margin-right: 0;
+  padding: 2px 10px 2px 14px;
+}
+#custom-power:hover {
+  background: alpha(@error, 0.28);
+  color: @on_surface;
+}
+
+/* ─── Tooltip ─────────────────────────────────────────── */
+tooltip {
+  background: @surface_container_highest;
+  border: 1px solid @outline;
+  border-radius: 8px;
+  color: @on_surface;
+  padding: 6px 10px;
+}
+tooltip label { color: @on_surface; }
+
+/* ─── Separator dot ───────────────────────────────────── */
+#separator {
+  color: @outline;
+  margin: 0 2px;
+}

@@ -1,0 +1,30 @@
+* {
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    border-image: none;
+    border-radius: 0;
+    box-shadow: none;
+    text-shadow: none;
+    outline: none;
+    margin: 0;
+    padding: 0;
+    font-family: "JetBrainsMono Nerd Font", "JetBrains Mono", sans-serif;
+    font-size: 12px;
+    color: #FDF9EB;
+}
+
+.workspace-bar {
+    spacing: 4px;
+    padding: 0 6px;
+}
+
+.ws-label {
+    font-weight: normal;
+    padding: 0 4px;
+}
+
+.ws-label.active {
+    font-weight: bold;
+}

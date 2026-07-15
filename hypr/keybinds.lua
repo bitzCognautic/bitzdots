@@ -1,0 +1,103 @@
+local S  = "SUPER"
+local SA = "SUPER + ALT"
+local SS = "SUPER + SHIFT"
+local SC = "SUPER + CTRL"
+
+-- Terminal
+hl.bind(S .. " + T", hl.dsp.exec_cmd("kitty"))
+
+-- Close active window
+hl.bind(S .. " + Q", hl.dsp.window.close())
+
+-- File manager
+hl.bind(S .. " + E", hl.dsp.exec_cmd("nautilus --new-window"))
+
+-- Fullscreen
+hl.bind(S .. " + F", hl.dsp.window.fullscreen())
+
+-- Browser
+hl.bind(S .. " + W", hl.dsp.exec_cmd("brave-origin || brave-browser"))
+
+-- Lock screen
+hl.bind(S .. " + L", hl.dsp.exec_cmd("hyprlock"))
+
+-- Mouse: move window
+hl.bind(S .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
+
+-- Mouse: resize window
+hl.bind(S .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+
+-- Resize mode
+hl.bind(S .. " + R", hl.dsp.submap("resize"))
+hl.define_submap("resize", function()
+    hl.bind("right",      hl.dsp.window.resize({ x = 10,  y = 0,    relative = true }), { repeating = true })
+    hl.bind("left",       hl.dsp.window.resize({ x = -10, y = 0,    relative = true }), { repeating = true })
+    hl.bind("up",         hl.dsp.window.resize({ x = 0,   y = -10,  relative = true }), { repeating = true })
+    hl.bind("down",       hl.dsp.window.resize({ x = 0,   y = 10,   relative = true }), { repeating = true })
+    hl.bind("Escape",     hl.dsp.submap("reset"))
+    hl.bind(S .. " + R", hl.dsp.submap("reset"))
+    hl.bind("catchall",   hl.dsp.submap("reset"))
+end)
+
+-- Workspace 1-9
+for i = 1, 9 do
+    hl.bind(S  .. " + " .. i,           hl.dsp.focus({ workspace = i }))
+    hl.bind(SS .. " + " .. i,           hl.dsp.window.move({ workspace = i }))
+end
+hl.bind(S  .. " + 0", hl.dsp.focus({ workspace = 10 }))
+hl.bind(SS .. " + 0", hl.dsp.window.move({ workspace = 10 }))
+
+-- Cycle inside current group with mouse wheel
+hl.bind(S .. " + mouse_down", hl.dsp.focus({ workspace = "-1" }))
+hl.bind(S .. " + mouse_up",   hl.dsp.focus({ workspace = "+1" }))
+
+-- Move focused window to adjacent workspace with SUPER+ALT+scroll
+hl.bind(SA .. " + mouse_down", hl.dsp.window.move({ workspace = "-1" }))
+hl.bind(SA .. " + mouse_up",   hl.dsp.window.move({ workspace = "+1" }))
+
+-- SUPER+SHIFT+scroll same behavior
+hl.bind(SS .. " + mouse_down", hl.dsp.window.move({ workspace = "-1" }))
+hl.bind(SS .. " + mouse_up",   hl.dsp.window.move({ workspace = "+1" }))
+
+-- Selection screenshot: grim + slurp + wl-copy
+hl.bind(SS .. " + S", hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | wl-copy"))
+
+-- OCR screenshot
+hl.bind(SS .. " + T", hl.dsp.exec_cmd("~/.local/bin/eink-ocr"))
+
+-- Print screen: full screenshot
+hl.bind("Print", hl.dsp.exec_cmd("grim"))
+
+-- Color picker
+hl.bind(SC .. " + C", hl.dsp.exec_cmd("hyprpicker -a && wl-copy && notify-send \"Color picked\" \"$(wl-paste)\""))
+
+-- Notifications
+hl.bind(S .. " + N", hl.dsp.exec_cmd("swaync-client -t"))
+
+-- Rofi launcher
+hl.bind(S .. " + space", hl.dsp.exec_cmd("rofi -show drun -config ~/.config/rofi/launcher.rasi"))
+
+-- Power menu
+hl.bind(S .. " + P", hl.dsp.exec_cmd("~/.config/rofi/system-menu.sh"))
+
+-- Clipboard history
+hl.bind(S  .. " + V", hl.dsp.exec_cmd("cliphist list | rofi -dmenu | cliphist decode | wl-copy"))
+hl.bind(SA .. " + V", hl.dsp.exec_cmd("cliphist wipe"))
+
+-- Additional useful binds
+hl.bind(SC .. " + Q", hl.dsp.exit())
+hl.bind(SC .. " + F", hl.dsp.window.float({ action = "toggle" }))
+hl.bind(SS .. " + space", hl.dsp.exec_cmd("wofi --show drun"))
+hl.bind(S  .. " + C",     hl.dsp.exec_cmd("code"))
+
+-- Wallpaper selector
+hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("~/.config/wallust/wallpaper-select.sh"))
+
+-- Screen recording
+-------- Fullscreen with internal audio
+--------hl.bind("SUPER + R", hl.dsp.exec_cmd("~/.config/scripts/record-fullscreen.sh"))
+--------
+--------
+-------- Region with internal audio
+--------hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("~/.config/scripts/record-region.sh"))
+--------

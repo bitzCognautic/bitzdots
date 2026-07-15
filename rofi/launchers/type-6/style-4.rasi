@@ -1,0 +1,236 @@
+/**
+ *
+ * Author : Aditya Shakya (adi1090x)
+ * Modified: Minimal Teto — Wallpaper Edition
+ *
+ * ┌─ INSTRUCCIÓN ──────────────────────────────────────────────┐
+ * │ Cambia la ruta en `imagebox > background-image` por la    │
+ * │ ruta real de tu wallpaper. Ejemplos comunes en Hyprland:  │
+ * │   url("~/Pictures/teto.png", height)                      │
+ * │   url("~/.config/hypr/wallpapers/teto.png", height)       │
+ * │   url("~/.local/share/wallpapers/teto.png", height)       │
+ * └────────────────────────────────────────────────────────────┘
+ *
+ * Rofi Version: 1.7.3
+ **/
+
+/*****----- Configuration -----*****/
+configuration {
+    modi:                       "drun,run,filebrowser,window";
+    show-icons:                 true;
+    display-drun:               "APPS";
+    display-run:                "RUN";
+    display-filebrowser:        "FILES";
+    display-window:             "WINDOW";
+    drun-display-format:        "{name}";
+    window-format:              "{w} · {c} · {t}";
+}
+
+/*****----- Global Properties -----*****/
+* {
+    font:                        "JetBrains Mono Nerd Font 10";
+
+    /* Colores base de Teto — borgoña oscuro + crema */
+    background:                  #3D152580;
+    background-solid:            #3D1525;
+    background-alt:              #2A0D18bb;
+    foreground:                  #FAE8EC;
+    selected:                    #E8375A;
+    active:                      #4A3040;
+    urgent:                      #3ECFA0;
+    border-col:                  #5C203588;
+}
+
+/*****----- Main Window -----*****/
+window {
+    transparency:                "real";
+    location:                    center;
+    anchor:                      center;
+    fullscreen:                  false;
+    width:                       900px;
+
+    enabled:                     true;
+    border-radius:               16px;
+    border:                      1px solid;
+    border-color:                @border-col;
+    cursor:                      "default";
+    background-color:            @background-solid;
+}
+
+/*****----- Main Box -----*****/
+mainbox {
+    enabled:                     true;
+    spacing:                     0px;
+    background-color:            transparent;
+    orientation:                 horizontal;
+    children:                    [ "imagebox", "listbox" ];
+}
+
+/*****----- Image Panel (izquierdo) -----*****/
+imagebox {
+    padding:                     20px;
+    /* ↓↓↓ CAMBIA ESTA RUTA POR TU WALLPAPER ↓↓↓ */
+    background-image: url("/home/bitz/wallpapers/4c2ifkya9yrf1.png", height);
+    background-color:            transparent;
+    orientation:                 vertical;
+    children:                    [ "inputbar", "dummy", "mode-switcher" ];
+    width:                       340px;
+}
+
+listbox {
+    spacing:                     12px;
+    padding:                     20px;
+    background-color:            @background-alt;
+    orientation:                 vertical;
+    children:                    [ "message", "listview" ];
+}
+
+dummy {
+    background-color:            transparent;
+}
+
+/*****----- Inputbar -----*****/
+inputbar {
+    enabled:                     true;
+    spacing:                     8px;
+    padding:                     12px 16px;
+    border-radius:               10px;
+    background-color:            #1A08108f;
+    text-color:                  @foreground;
+    children:                    [ "textbox-prompt-colon", "entry" ];
+}
+
+textbox-prompt-colon {
+    font:                        "JetBrainsMono Nerd Font Mono 10";
+    enabled:                     true;
+    expand:                      false;
+    str:                         "";
+    background-color:            transparent;
+    text-color:                  @selected;
+}
+
+entry {
+    enabled:                     true;
+    background-color:            transparent;
+    text-color:                  @foreground;
+    cursor:                      text;
+    placeholder:                 "Buscar...";
+    placeholder-color:           #FAE8EC66;
+}
+
+/*****----- Mode Switcher -----*****/
+mode-switcher {
+    enabled:                     true;
+    spacing:                     8px;
+    background-color:            transparent;
+    text-color:                  @foreground;
+}
+
+button {
+    padding:                     10px;
+    border-radius:               8px;
+    background-color:            #1A08108f;
+    text-color:                  @foreground;
+    cursor:                      pointer;
+}
+
+button selected {
+    background-color:            @selected;
+    text-color:                  @foreground;
+}
+
+/*****----- Listview -----*****/
+listview {
+    enabled:                     true;
+    columns:                     1;
+    lines:                       8;
+    cycle:                       true;
+    dynamic:                     true;
+    scrollbar:                   false;
+    layout:                      vertical;
+    reverse:                     false;
+    fixed-height:                true;
+    fixed-columns:               true;
+
+    spacing:                     6px;
+    background-color:            transparent;
+    text-color:                  @foreground;
+    cursor:                      "default";
+}
+
+/*****----- Elements -----*****/
+element {
+    enabled:                     true;
+    spacing:                     12px;
+    padding:                     8px 10px;
+    border-radius:               8px;
+    background-color:            transparent;
+    text-color:                  @foreground;
+    cursor:                      pointer;
+}
+
+element normal.normal {
+    background-color:            transparent;
+    text-color:                  @foreground;
+}
+
+element normal.urgent {
+    background-color:            @urgent;
+    text-color:                  @background-solid;
+}
+
+element normal.active {
+    background-color:            @active;
+    text-color:                  @foreground;
+}
+
+element selected.normal {
+    background-color:            @selected;
+    text-color:                  @foreground;
+}
+
+element selected.urgent {
+    background-color:            @urgent;
+    text-color:                  @background-solid;
+}
+
+element selected.active {
+    background-color:            @urgent;
+    text-color:                  @background-solid;
+}
+
+element-icon {
+    background-color:            transparent;
+    text-color:                  inherit;
+    size:                        28px;
+    cursor:                      inherit;
+}
+
+element-text {
+    background-color:            transparent;
+    text-color:                  inherit;
+    cursor:                      inherit;
+    vertical-align:              0.5;
+    horizontal-align:            0.0;
+}
+
+/*****----- Message -----*****/
+message {
+    background-color:            transparent;
+}
+
+textbox {
+    padding:                     12px;
+    border-radius:               8px;
+    background-color:            @background-alt;
+    text-color:                  @foreground;
+    vertical-align:              0.5;
+    horizontal-align:            0.0;
+}
+
+error-message {
+    padding:                     15px;
+    border-radius:               12px;
+    background-color:            @background-solid;
+    text-color:                  @foreground;
+}
