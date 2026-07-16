@@ -129,6 +129,14 @@ set_static() {
     fi
 
     "$CONFIG_DIR/wallust/reload-theme.sh" || true
+
+    # Restart waybar to pick up new config.jsonc and CSS
+    if pgrep -x waybar > /dev/null; then
+        pkill -x waybar 2>/dev/null || true
+        sleep 0.3
+        waybar &>/dev/null &
+    fi
+
     notify-send -i "$img" "Theme updated" "Wallpaper and colors applied"
 }
 
@@ -158,6 +166,13 @@ set_live() {
                 cache_current_theme "$name" || true
             fi
             "$CONFIG_DIR/wallust/reload-theme.sh" || true
+
+            # Restart waybar to pick up new config.jsonc and CSS
+            if pgrep -x waybar > /dev/null; then
+                pkill -x waybar 2>/dev/null || true
+                sleep 0.3
+                waybar &>/dev/null &
+            fi
         fi
     fi
 

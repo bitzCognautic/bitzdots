@@ -17,10 +17,13 @@ if pgrep -x swaync > /dev/null; then
     echo "   SwayNC CSS reloaded"
 fi
 
-# --- Hyprland: reload config to pick up new colors ---
-if command -v hyprctl &>/dev/null; then
-    hyprctl reload &>/dev/null || true
-    echo "   Hyprland config reloaded"
+# --- Hyprland border colors: update via eval (avoids full config reload) ---
+if command -v hyprctl &>/dev/null && [ -f "$CONFIG_DIR/hypr/colors.lua" ]; then
+    c1=$(grep "color1" "$CONFIG_DIR/hypr/colors.lua" | head -1 | sed "s/.*= \"\(.*\)\",/\1/")
+    c4=$(grep "color4" "$CONFIG_DIR/hypr/colors.lua" | head -1 | sed "s/.*= \"\(.*\)\",/\1/")
+    c8=$(grep "color8" "$CONFIG_DIR/hypr/colors.lua" | head -1 | sed "s/.*= \"\(.*\)\",/\1/")
+    [ -n "$c1" ] && [ -n "$c4" ] && hyprctl eval "hl.config({ general = { col = { active_border = { colors = {\"rgba(${c1}ee)\", \"rgba(${c4}ee)\"}, angle = 45 }, inactive_border = \"rgba(${c8}ee)\" } } })" &>/dev/null || true
+    echo "   Hyprland border colors updated"
 fi
 
 echo ":: Theme reload complete!"
