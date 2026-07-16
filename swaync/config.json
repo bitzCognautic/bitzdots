@@ -11,7 +11,7 @@
   "control-center-margin-right": 8,
   "control-center-height": 700,
   "control-center-width": 340,
-  "transition-time": 200,
+  "transition-time": 0,
   "hide-on-clear": false,
   
   "widgets": [
@@ -34,14 +34,14 @@
     "volume": { "label": "󰕾", "show-per-app": true },
     "backlight": { "label": "󰃟", "device": "intel_backlight" },
     "dnd": {
-      "text": "No Molestar"
+      "text": "Do Not Disturb"
     },
-    "title": { "text": "♪ Notificaciones", "button-text": "Limpiar" },
+    "title": { "text": "Notifications", "button-text": "Clear" },
     "buttons-grid": {
       "buttons-per-row": 4,
       "actions": [
         {
-          "label": "󰖩",
+          "label": "󰤨",
           "type": "toggle",
           "active": true,
           "command": "sh -c '[[ $SWAYNC_TOGGLE_STATE == true ]] && nmcli radio wifi on || nmcli radio wifi off'",

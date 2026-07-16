@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-MAX=45
+MAX=20
 
 # Función para procesar y emitir el JSON
 emit() {

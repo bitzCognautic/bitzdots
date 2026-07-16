@@ -9,8 +9,8 @@ hl.bind(S .. " + T", hl.dsp.exec_cmd("kitty"))
 -- Close active window
 hl.bind(S .. " + Q", hl.dsp.window.close())
 
--- File manager
-hl.bind(S .. " + E", hl.dsp.exec_cmd("nautilus --new-window"))
+-- File manager (Dolphin with wallust colors)
+hl.bind(S .. " + E", hl.dsp.exec_cmd("dolphin"))
 
 -- Fullscreen
 hl.bind(S .. " + F", hl.dsp.window.fullscreen())
@@ -27,15 +27,15 @@ hl.bind(S .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
 -- Mouse: resize window
 hl.bind(S .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
--- Resize mode
-hl.bind(S .. " + R", hl.dsp.submap("resize"))
+-- Resize mode (SUPER+CTRL+R)
+hl.bind(SC .. " + R", hl.dsp.submap("resize"))
 hl.define_submap("resize", function()
     hl.bind("right",      hl.dsp.window.resize({ x = 10,  y = 0,    relative = true }), { repeating = true })
     hl.bind("left",       hl.dsp.window.resize({ x = -10, y = 0,    relative = true }), { repeating = true })
     hl.bind("up",         hl.dsp.window.resize({ x = 0,   y = -10,  relative = true }), { repeating = true })
     hl.bind("down",       hl.dsp.window.resize({ x = 0,   y = 10,   relative = true }), { repeating = true })
     hl.bind("Escape",     hl.dsp.submap("reset"))
-    hl.bind(S .. " + R", hl.dsp.submap("reset"))
+    hl.bind(SC .. " + R", hl.dsp.submap("reset"))
     hl.bind("catchall",   hl.dsp.submap("reset"))
 end)
 
@@ -75,18 +75,19 @@ hl.bind(SC .. " + C", hl.dsp.exec_cmd("hyprpicker -a && wl-copy && notify-send \
 hl.bind(S .. " + N", hl.dsp.exec_cmd("swaync-client -t"))
 
 -- Rofi launcher
-hl.bind(S .. " + space", hl.dsp.exec_cmd("rofi -show drun -config ~/.config/rofi/launcher.rasi"))
+hl.bind(S .. " + space", hl.dsp.exec_cmd("rofi -show drun -theme ~/.config/rofi/themes/launcher.rasi"))
 
 -- Power menu
 hl.bind(S .. " + P", hl.dsp.exec_cmd("~/.config/rofi/system-menu.sh"))
 
 -- Clipboard history
-hl.bind(S  .. " + V", hl.dsp.exec_cmd("cliphist list | rofi -dmenu | cliphist decode | wl-copy"))
+hl.bind(S  .. " + V", hl.dsp.exec_cmd("~/.config/rofi/scripts/clipboard.sh"))
 hl.bind(SA .. " + V", hl.dsp.exec_cmd("cliphist wipe"))
 
 -- Additional useful binds
 hl.bind(SC .. " + Q", hl.dsp.exit())
 hl.bind(SC .. " + F", hl.dsp.window.float({ action = "toggle" }))
+hl.bind(S  .. " + H", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(SS .. " + space", hl.dsp.exec_cmd("wofi --show drun"))
 hl.bind(S  .. " + C",     hl.dsp.exec_cmd("code"))
 
@@ -94,10 +95,5 @@ hl.bind(S  .. " + C",     hl.dsp.exec_cmd("code"))
 hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("~/.config/wallust/wallpaper-select.sh"))
 
 -- Screen recording
--------- Fullscreen with internal audio
---------hl.bind("SUPER + R", hl.dsp.exec_cmd("~/.config/scripts/record-fullscreen.sh"))
---------
---------
--------- Region with internal audio
---------hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("~/.config/scripts/record-region.sh"))
---------
+hl.bind(S  .. " + R",  hl.dsp.exec_cmd("~/.config/wallust/record-fullscreen.sh"))
+hl.bind(SS .. " + R",  hl.dsp.exec_cmd("~/.config/wallust/record-region.sh"))

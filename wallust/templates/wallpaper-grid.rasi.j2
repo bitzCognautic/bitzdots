@@ -5,8 +5,8 @@
     bg1:    {{color8}};
     fg0:    {{foreground}};
     fg1:    {{color7}};
-    accent: {{color5}};
-    select: rgba({{color5 | rgb}}, 0.20);
+    accent: {{color1}};
+    select: {{color8}};
 
     background-color: transparent;
     text-color:       @fg0;
@@ -15,7 +15,7 @@
 
 window {
     width:            850px;
-    border:           2px;
+    border:           3px;
     border-color:     @accent;
     border-radius:    0;
     background-color: @bg0;
@@ -26,35 +26,45 @@ mainbox {
 }
 
 inputbar {
-    padding:          12px;
+    padding:          14px 18px 10px;
     background-color: @bg1;
-    children:         [ prompt, entry ];
+    children:         [ prompt ];
 }
 
 prompt {
-    text-color: @accent;
+    font:             "JetBrainsMono Nerd Font Bold 12";
+    text-color:       @accent;
 }
 
 listview {
     columns:      3;
     lines:        2;
-    spacing:      20px;
-    padding:      20px;
+    spacing:      8px;
+    padding:      12px;
     fixed-height: false;
     flow:         horizontal;
 }
 
 element {
     orientation:      vertical;
-    padding:          15px;
+    padding:          12px;
     border-radius:    0;
     spacing:          10px;
 }
 
-element selected {
-    background-color: @select;
-    border:           2px;
+element normal {
+    border:           1px;
     border-color:     @accent;
+}
+element selected {
+
+    background-color: @select;
+    border:           3px;
+    border-color:     @accent;
+}
+
+element selected text {
+    text-color:       @accent;
 }
 
 element-icon {
@@ -65,8 +75,4 @@ element-icon {
 element-text {
     horizontal-align: 0.5;
     text-color:       @fg1;
-}
-
-element selected text {
-    text-color:       @fg0;
 }

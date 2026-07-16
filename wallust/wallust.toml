@@ -39,3 +39,36 @@ wallpaper_grid.target = "~/.config/rofi/themes/wallpaper-grid.rasi"
 
 power.template = "power.rasi.j2"
 power.target = "~/.config/rofi/themes/power.rasi"
+
+launcher.template = "launcher.rasi.j2"
+launcher.target = "~/.config/rofi/themes/launcher.rasi"
+
+hyprlock.template = "hyprlock.conf.j2"
+hyprlock.target = "~/.config/hypr/hyprlock.conf"
+
+icon_lock.template = "lock.svg.j2"
+icon_lock.target = "~/.config/rofi/icons/lock.svg"
+
+icon_logout.template = "logout.svg.j2"
+icon_logout.target = "~/.config/rofi/icons/logout.svg"
+
+icon_sleep.template = "sleep.svg.j2"
+icon_sleep.target = "~/.config/rofi/icons/sleep.svg"
+
+icon_reboot.template = "reboot.svg.j2"
+icon_reboot.target = "~/.config/rofi/icons/reboot.svg"
+
+icon_shutdown.template = "shutdown.svg.j2"
+icon_shutdown.target = "~/.config/rofi/icons/shutdown.svg"
+
+icon_cancel.template = "cancel.svg.j2"
+icon_cancel.target = "~/.config/rofi/icons/cancel.svg"
+
+icon_static.template = "static.svg.j2"
+icon_static.target = "~/.config/rofi/icons/static.svg"
+
+icon_live.template = "live.svg.j2"
+icon_live.target = "~/.config/rofi/icons/live.svg"
+
+kdeglobals.template = "kdeglobals.j2"
+kdeglobals.target = "~/.config/kdeglobals"

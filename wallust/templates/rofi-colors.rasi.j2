@@ -6,7 +6,7 @@
     fg0:    {{foreground}};
     fg1:    {{color7}};
     accent: {{color1}};
-    select: rgba({{color1 | rgb}}, 0.20);
+    select: {{color8}};
     urgent: {{color9}};
 
     background-color: transparent;
@@ -54,8 +54,12 @@ element {
 
 element selected {
     background-color: @select;
-    border:           2px;
+    border:           3px;
     border-color:     @accent;
+}
+
+element selected text {
+    text-color:       @accent;
 }
 
 element-icon {
@@ -66,8 +70,4 @@ element-icon {
 element-text {
     horizontal-align: 0.5;
     text-color:       @fg1;
-}
-
-element selected text {
-    text-color:       @fg0;
 }

@@ -1,32 +1,22 @@
 #!/bin/bash
+ICON_DIR="$HOME/.config/rofi/icons"
 
-MENU_ITEMS=(
-    "Lock"
-    "Logout"
-    "Sleep"
-    "Reboot"
-    "Shutdown"
-    "Cancel"
+choice=$(
+    printf '%s\0icon\x1f%s\n' \
+        "Lock"     "$ICON_DIR/lock.svg" \
+        "Logout"   "$ICON_DIR/logout.svg" \
+        "Sleep"    "$ICON_DIR/sleep.svg" \
+        "Reboot"   "$ICON_DIR/reboot.svg" \
+        "Shutdown" "$ICON_DIR/shutdown.svg" \
+        "Cancel"   "$ICON_DIR/cancel.svg" \
+    | rofi -dmenu -show-icons -p "Power" -theme "$HOME/.config/rofi/themes/power.rasi"
 )
 
-ICONS_DIR="$HOME/.config/rofi/icons"
-ITEMS=""
-for item in "${MENU_ITEMS[@]}"; do
-    icon_file="$ICONS_DIR/${item}.svg"
-    if [ -f "$icon_file" ]; then
-        ITEMS+="${item}\0icon\x1f${icon_file}\n"
-    else
-        ITEMS+="${item}\n"
-    fi
-done
-
-choice=$(echo -e "$ITEMS" | rofi -dmenu -p "Power" -theme "$HOME/.config/rofi/themes/power.rasi")
-
 case "$choice" in
-    "Lock")     loginctl lock-session ;;
+    "Lock")     hyprlock ;;
     "Logout")   hyprctl dispatch exit ;;
     "Sleep")    systemctl suspend ;;
     "Reboot")   systemctl reboot ;;
     "Shutdown") systemctl poweroff ;;
-    *)          exit 0 ;;
+    "Cancel"|*) exit 0 ;;
 esac

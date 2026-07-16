@@ -19,6 +19,7 @@ configuration {
 /*	cache-dir: ;*/
 	steal-focus: false;
 /*	dpi: -1;*/
+	dmtransition: 0;
 
 	/*---------- Matching setting ----------*/
 	matching: "normal";
@@ -184,4 +185,4 @@ configuration {
 
 //@theme "/home/bitz/.config/rofi/themes/squared-material-red.rasi"
 
-@theme "/home/bitz/.config/rofi/theme-generated.rasi"
+@theme "~/.config/rofi/theme-generated.rasi"

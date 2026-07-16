@@ -10,9 +10,30 @@
   "margin-bottom": 0,
   "reload_style_on_change": true,
 
-  "modules-left": ["custom/workspaces"],
+  "modules-left": ["custom/workspaces", "custom/runcat", "custom/media-prev", "custom/media", "custom/media-next"],
   "modules-center": ["clock"],
-  "modules-right": ["network", "bluetooth", "pulseaudio", "cpu", "memory", "custom/power-profiles", "custom/power"],
+  "modules-right": ["tray", "custom/recording", "custom/brightness", "pulseaudio", "cpu", "memory", "custom/power-profiles", "custom/notification", "network", "bluetooth", "custom/power"],
+
+  "tray": {
+    "spacing": 8
+  },
+
+  "custom/media": {
+    "exec": "~/.config/waybar/scripts/media.sh",
+    "return-type": "json",
+    "tooltip": true,
+    "on-click": "playerctl play-pause",
+    "on-click-right": "playerctl stop",
+    "on-scroll-up": "playerctl next",
+    "on-scroll-down": "playerctl previous"
+  },
+
+  "custom/runcat": {
+    "exec": "~/.config/waybar/modules/runcat-text/.venv/bin/python ~/.config/waybar/modules/runcat-text/main.py",
+    "return-type": "json",
+    "restart-interval": 10,
+    "tooltip": true
+  },
 
   "custom/workspaces": {
     "exec": "~/.config/waybar/scripts/workspaces.sh",
@@ -24,9 +45,16 @@
     "on-click": "~/.config/waybar/scripts/workspace-click.sh"
   },
 
+  "custom/recording": {
+    "exec": "~/.config/wallust/recording-indicator.sh",
+    "return-type": "json",
+    "interval": 1,
+    "tooltip": false
+  },
+
   "clock": {
     "interval": 1,
-    "format": "{:%H:%M}",
+    "format": "{:%I:%M %p}",
     "format-alt": "{:%A, %d %B %Y}",
     "tooltip-format": "<tt><small>{calendar}</small></tt>",
     "calendar": {
@@ -98,6 +126,24 @@
     "exec": "~/.config/waybar/scripts/power-profile.sh",
     "interval": 5,
     "on-click": "~/.config/waybar/scripts/power-profile-switch.sh"
+  },
+
+  "custom/brightness": {
+    "exec": "~/.config/waybar/scripts/brightness.sh",
+    "return-type": "json",
+    "interval": 1,
+    "on-scroll-up": "brightnessctl s +5%",
+    "on-scroll-down": "brightnessctl s 5%-",
+    "tooltip": true
+  },
+
+  "custom/notification": {
+    "exec": "~/.config/waybar/scripts/notification.sh",
+    "return-type": "json",
+    "interval": 1,
+    "on-click": "swaync-client -t",
+    "on-click-right": "swaync-client -d",
+    "tooltip": true
   },
 
   "custom/power": {

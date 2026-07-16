@@ -3,9 +3,12 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("waybar &")
     hl.exec_cmd("swaync")
     hl.exec_cmd("polkit-kde-authentication-agent-1")
-    hl.exec_cmd("wl-clipboard-history --watch --replace")
+    hl.exec_cmd("wl-paste --watch cliphist store")
 
     -- Start wallpaper daemon and restore last wallpaper
     hl.exec_cmd("awww-daemon")
     hl.exec_cmd("bash -c 'sleep 0.5 && test -f $HOME/.cache/current_wallpaper.png && awww img $HOME/.cache/current_wallpaper.png'")
+
+    -- Pre-cache wallust colors for all wallpapers (runs in background)
+    hl.exec_cmd("bash -c '~/.config/wallust/cache-wallpapers.sh --daemon &'")
 end)

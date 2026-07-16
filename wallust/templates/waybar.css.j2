@@ -74,6 +74,26 @@ tooltip label {
     color: @on_surface;
 }
 
+#custom-media {
+    padding: 0 10px;
+    margin: 0 4px;
+    color: @on_surface_variant;
+}
+
+#custom-media.playing {
+    color: @primary;
+}
+
+#custom-media.paused {
+    color: @on_surface_variant;
+}
+
+#custom-media-prev,
+#custom-media-next {
+    padding: 0 6px;
+    color: @on_surface_variant;
+}
+
 #network {
     padding: 0 10px;
     margin: 0 2px;
@@ -150,12 +170,78 @@ tooltip label {
     color: @error;
 }
 
+#tray {
+    padding: 0 8px;
+    margin: 0 3px;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+    background-color: alpha(@error, 0.1);
+}
+
 #custom-workspaces {
     margin: 0;
-    padding: 0 12px;
+    padding: 0 4px 0 12px;
     letter-spacing: 2px;
     color: @on_surface;
     font-weight: 800;
+}
+
+#custom-runcat {
+    margin: 0;
+    padding: 0 2px 0 4px;
+    font-family: "runcat", "JetBrainsMono Nerd Font", monospace;
+    font-size: 18px;
+    letter-spacing: 0;
+    color: @on_surface_variant;
+}
+
+#custom-runcat.low {
+    color: @on_surface;
+}
+
+#custom-runcat.medium {
+    color: @secondary;
+}
+
+#custom-runcat.high {
+    color: @error;
+}
+
+#custom-recording {
+    padding: 0 10px;
+    margin: 0 3px;
+}
+
+#custom-recording.recording {
+    color: @error;
+}
+
+#custom-recording.idle {
+    color: transparent;
+}
+
+#custom-brightness {
+    padding: 0 6px;
+    color: @on_surface_variant;
+}
+
+#custom-notification {
+    padding: 0 6px;
+    color: @surface_container;
+}
+
+#custom-notification.has {
+    color: @foreground;
+}
+
+#custom-notification.dnd {
+    color: @error;
 }
 
 

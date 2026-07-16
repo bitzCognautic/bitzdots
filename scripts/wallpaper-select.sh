@@ -1,23 +1,103 @@
 #!/bin/bash
 # Rofi wallpaper selector with automatic theme generation via wallust
-set -euo pipefail
 
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 WALL_DIR="${WALLPAPER_DIR:-$HOME/Pictures/Wallpapers}"
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+THEME_CACHE="$CACHE_DIR/wallust/themes"
 ROFI_THEME="$CONFIG_DIR/rofi/themes/wallpaper-grid.rasi"
+ROFI_POWER="$CONFIG_DIR/rofi/themes/power.rasi"
 LIVE_DIR="$WALL_DIR/live"
+THUMB_DIR="$CACHE_DIR/wallust-thumbs"
 
-mkdir -p "$CACHE_DIR"
+mkdir -p "$CACHE_DIR" "$THUMB_DIR" "$THEME_CACHE"
 
 if [ ! -d "$WALL_DIR" ]; then
     notify-send -u critical "Wallpapers not found" "Directory $WALL_DIR does not exist"
     exit 1
 fi
 
+WALLUST_OUTPUTS=(
+    "waybar/style.css"
+    "waybar/config.jsonc"
+    "swaync/style.css"
+    "wlogout/style.css"
+    "hypr/colors.lua"
+    "kitty/colors.conf"
+    "cava/themes/generated"
+    "rofi/theme-generated.rasi"
+    "wallust/env"
+    "wallust/browser-colors.css"
+    "rofi/themes/wallpaper-grid.rasi"
+    "rofi/themes/power.rasi"
+    "rofi/icons/lock.svg"
+    "rofi/icons/logout.svg"
+    "rofi/icons/sleep.svg"
+    "rofi/icons/reboot.svg"
+    "rofi/icons/shutdown.svg"
+    "rofi/icons/cancel.svg"
+    "rofi/icons/static.svg"
+    "rofi/icons/live.svg"
+    "kdeglobals"
+)
+
+apply_cached_theme() {
+    local name="$1"
+    local cache_dir="$THEME_CACHE/$name"
+    local marker="$cache_dir/.done"
+
+    if [ ! -f "$marker" ]; then
+        return 1
+    fi
+
+    # Invalidate cache if templates changed since it was made
+    local template_dir="$CONFIG_DIR/wallust/templates"
+    local latest=0
+    for f in "$template_dir"/*.j2; do
+        [ -f "$f" ] || continue
+        local t
+        t=$(stat -c '%Y' "$f")
+        [ "$t" -gt "$latest" ] && latest=$t
+    done
+    local cache_time
+    cache_time=$(stat -c '%Y' "$marker")
+    if [ "$latest" -gt "$cache_time" ]; then
+        rm -rf "$cache_dir"
+        return 1
+    fi
+
+    for output in "${WALLUST_OUTPUTS[@]}"; do
+        local src="$cache_dir/$output"
+        local dst="$CONFIG_DIR/$output"
+        if [ -f "$src" ]; then
+            mkdir -p "$(dirname "$dst")"
+            cp "$src" "$dst"
+        fi
+    done
+
+    return 0
+}
+
+cache_current_theme() {
+    local name="$1"
+    local cache_dir="$THEME_CACHE/$name"
+
+    mkdir -p "$cache_dir"
+    for output in "${WALLUST_OUTPUTS[@]}"; do
+        local src="$CONFIG_DIR/$output"
+        if [ -f "$src" ]; then
+            mkdir -p "$(dirname "$cache_dir/$output")"
+            cp "$src" "$cache_dir/$output"
+        fi
+    done
+    touch "$cache_dir/.done"
+}
+
 # ── Helper: set static wallpaper ─────────────────────────────────
 set_static() {
     local img="$1"
+    local name
+    name="$(basename "$img" | sed 's/\.[^.]*$//')"
 
     if ! command -v wallust &>/dev/null; then
         notify-send -u critical "wallust not installed"
@@ -26,6 +106,9 @@ set_static() {
 
     echo "$img" > "$CACHE_DIR/current_wallpaper.txt"
     ln -sf "$img" "$CACHE_DIR/current_wallpaper.png" 2>/dev/null || true
+
+    # Stop any running live wallpaper first (awww can't override mpvpaper)
+    pkill mpvpaper 2>/dev/null || true
 
     if command -v awww &>/dev/null; then
         if ! pgrep -x awww-daemon > /dev/null; then
@@ -36,20 +119,23 @@ set_static() {
             --transition-type grow \
             --transition-pos center \
             --transition-duration 2 \
-            --transition-fps 60
+            --transition-fps 60 || true
     fi
 
-    wallust run "$img" --config-dir "$CONFIG_DIR/wallust"
+    if ! apply_cached_theme "$name"; then
+        wallust run "$img" --config-dir "$CONFIG_DIR/wallust" || true
+        cache_current_theme "$name" || true
+    fi
 
-    # Reload themed apps
-    "$CONFIG_DIR/wallust/reload-theme.sh"
-
+    "$CONFIG_DIR/wallust/reload-theme.sh" || true
     notify-send -i "$img" "Theme updated" "Wallpaper and colors applied"
 }
 
 # ── Helper: set live wallpaper ───────────────────────────────────
 set_live() {
     local video="$1"
+    local name
+    name="$(basename "$video" | sed 's/\.[^.]*$//')"
 
     if ! command -v mpvpaper &>/dev/null; then
         notify-send -u critical "mpvpaper not installed" "Install mpvpaper for live wallpapers"
@@ -58,34 +144,61 @@ set_live() {
 
     echo "$video" > "$CACHE_DIR/current_wallpaper.txt"
 
-    # Kill any existing mpvpaper instance
     pkill mpvpaper 2>/dev/null || true
-
-    # Play video as wallpaper
     mpvpaper -o "loop no-audio" '*' "$video"
 
-    # Generate colors from a frame if ffmpeg is available
     if command -v ffmpeg &>/dev/null && command -v wallust &>/dev/null; then
         local frame="$CACHE_DIR/live-frame.jpg"
         ffmpeg -i "$video" -vframes 1 "$frame" -y 2>/dev/null || true
         if [ -f "$frame" ]; then
             ln -sf "$frame" "$CACHE_DIR/current_wallpaper.png" 2>/dev/null || true
-            wallust run "$frame" --config-dir "$CONFIG_DIR/wallust"
-            "$CONFIG_DIR/wallust/reload-theme.sh"
+            if ! apply_cached_theme "$name"; then
+                wallust run "$frame" --config-dir "$CONFIG_DIR/wallust" || true
+                cache_current_theme "$name" || true
+            fi
+            "$CONFIG_DIR/wallust/reload-theme.sh" || true
         fi
     fi
 
     notify-send -i video "Live wallpaper" "$(basename "$video")"
 }
 
+# ── Generate thumbnail for video ─────────────────────────────────
+generate_thumb() {
+    local video="$1"
+    local thumb_name
+    thumb_name="$(basename "$video" | sed 's/\.[^.]*$//').jpg"
+    local thumb_path="$THUMB_DIR/$thumb_name"
+
+    if [ ! -f "$thumb_path" ] && command -v ffmpeg &>/dev/null; then
+        mkdir -p "$(dirname "$thumb_path")"
+        ffmpeg -i "$video" -vframes 1 -vf "scale=180:-1" "$thumb_path" -y 2>/dev/null || true
+    fi
+
+    if [ -f "$thumb_path" ]; then
+        echo "$thumb_path"
+    else
+        echo "$video"
+    fi
+}
+
 # ── Pick static wallpaper ────────────────────────────────────────
 pick_static() {
+    local images
+    mapfile -t images < <(find "$WALL_DIR" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | sort)
+
+    if [ ${#images[@]} -eq 0 ]; then
+        notify-send -u normal "No wallpapers found" "Add images to $WALL_DIR/"
+        return 1
+    fi
+
     local selected
-    selected=$(find "$WALL_DIR" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) \
-        | while read -r f; do
+    selected=$(
+        for f in "${images[@]}"; do
             echo -ne "$f\0icon\x1f$f\n"
         done \
-        | rofi -dmenu -i -theme "$ROFI_THEME" -p "  " -show-icons)
+        | rofi -dmenu -i -p "" -theme "$ROFI_THEME" -show-icons
+    )
 
     if [ -z "$selected" ]; then
         return 1
@@ -110,12 +223,22 @@ pick_live() {
         return 1
     fi
 
+    local videos
+    mapfile -t videos < <(find "$LIVE_DIR" -maxdepth 1 -type f \( -iname "*.mp4" -o -iname "*.webm" -o -iname "*.mkv" -o -iname "*.gif" \) | sort)
+
+    if [ ${#videos[@]} -eq 0 ]; then
+        notify-send -u normal "No live wallpapers" "Add videos to $LIVE_DIR/"
+        return 1
+    fi
+
     local selected
-    selected=$(find "$LIVE_DIR" -maxdepth 1 -type f \( -iname "*.mp4" -o -iname "*.webm" -o -iname "*.mkv" -o -iname "*.gif" \) \
-        | while read -r f; do
-            echo -ne "$f\0icon\x1f$f\n"
+    selected=$(
+        for f in "${videos[@]}"; do
+            thumb=$(generate_thumb "$f")
+            echo -ne "$f\0icon\x1f$thumb\n"
         done \
-        | rofi -dmenu -i -theme "$ROFI_THEME" -p "  " -show-icons)
+        | rofi -dmenu -i -p "" -theme "$ROFI_THEME" -show-icons
+    )
 
     if [ -z "$selected" ]; then
         return 1
@@ -138,11 +261,15 @@ main_menu() {
     local has_live=false
     [ -d "$LIVE_DIR" ] && [ "$(find "$LIVE_DIR" -maxdepth 1 -type f 2>/dev/null | wc -l)" -gt 0 ] && has_live=true
 
-    local options="Static wallpaper"
-    $has_live && options="$options\nLive wallpaper"
-
+    local icons_dir="$CONFIG_DIR/rofi/icons"
     local choice
-    choice=$(echo -e "$options" | rofi -dmenu -i -theme "$ROFI_THEME" -p "  ")
+    choice=$(
+        {
+            printf "Static wallpaper\0icon\x1f${icons_dir}/static.svg\n"
+            $has_live && printf "Live wallpaper\0icon\x1f${icons_dir}/live.svg\n"
+        } | rofi -dmenu -i -p "Wallpaper" -theme "$ROFI_POWER" -show-icons \
+            -theme-str 'listview { lines: 2; }'
+    )
 
     case "$choice" in
         "Static wallpaper") pick_static ;;

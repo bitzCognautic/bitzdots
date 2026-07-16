@@ -48,8 +48,8 @@ install_deps() {
             sudo pacman -S --needed --noconfirm \
                 waybar swaync rofi kitty cava \
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
-                polkit-kde-agent grim slurp cliphist \
-                impala bluetui btop pulsemixer wf-recorder 2>&1 | \
+                polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
+                impala bluetui btop pulsemixer wf-recorder python 2>&1 | \
                 grep -o "target not found: [^']*" | cut -d' ' -f4 > /tmp/missing_pkgs.txt || true
 
 
@@ -75,7 +75,7 @@ install_deps() {
             sudo dnf install -y \
                 waybar swaync wlogout rofi kitty cava \
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
-                polkit-kde-agent grim slurp cliphist
+                polkit-kde-agent grim slurp cliphist hyprlock ffmpeg
             # Install wallust from crates.io
             if ! command -v wallust &>/dev/null; then
                 warn "wallust not in repos, installing via cargo..."
@@ -87,7 +87,7 @@ install_deps() {
             sudo apt install -y \
                 waybar swaync wlogout rofi kitty cava \
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
-                polkit-kde-agent grim slurp cliphist
+                polkit-kde-agent grim slurp cliphist hyprlock ffmpeg
             if ! command -v wallust &>/dev/null; then
                 warn "wallust not in repos, installing via cargo..."
                 cargo install wallust
@@ -101,7 +101,7 @@ install_deps() {
             echo "  environment.systemPackages = with pkgs; ["
             echo "    wallust swaync wlogout kitty cava"
             echo "    hyprpicker wl-clipboard playerctl pavucontrol"
-            echo "    polkit-kde-agent grim slurp cliphist"
+            echo "    polkit-kde-agent grim slurp cliphist hyprlock ffmpeg"
             echo "  ];"
             ;;
         *)
@@ -110,56 +110,34 @@ install_deps() {
             echo "  - waybar, swaync, wlogout, rofi, kitty, cava"
             echo "  - awww, hyprpicker, wl-clipboard, playerctl"
             echo "  - pavucontrol, polkit-kde-agent, grim, slurp, cliphist"
+            echo "  - hyprlock, ffmpeg"
             ;;
     esac
 }
 
 install_nerd_font() {
-    local font_name="JetBrainsMono"
-    local font_dir="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"
-    local nerd_ver="3.3.0"
-
-    if fc-list "JetBrainsMono Nerd Font" 2>/dev/null | grep -qi "JetBrainsMonoNerdFont"; then
+    if fc-list :family 2>/dev/null | grep -qi "JetBrainsMono Nerd Font"; then
         ok "JetBrainsMono Nerd Font already installed"
         return
     fi
 
-    if fc-list "$font_name" 2>/dev/null | grep -qi "$font_name"; then
-        warn "JetBrainsMono found but Nerd Font variant missing — downloading..."
-    else
-        log "JetBrainsMono Nerd Font not found — downloading..."
+    log "Installing JetBrainsMono Nerd Font from AUR..."
+
+    if command -v paru &>/dev/null; then
+        paru -S --needed --noconfirm ttf-jetbrains-mono-nerd && {
+            ok "JetBrainsMono Nerd Font installed via paru"
+            return
+        }
     fi
 
-    local tmpdir
-    tmpdir=$(mktemp -d)
-    local zipfile="$tmpdir/JetBrainsMono.zip"
-
-    if command -v curl &>/dev/null; then
-        curl -fsSL "https://github.com/ryanoasis/nerd-fonts/releases/download/v${nerd_ver}/JetBrainsMono.tar.xz" -o "$tmpdir/JetBrainsMono.tar.xz"
-        if [ -f "$tmpdir/JetBrainsMono.tar.xz" ]; then
-            mkdir -p "$font_dir/JetBrainsMonoNerd"
-            tar -xf "$tmpdir/JetBrainsMono.tar.xz" -C "$font_dir/JetBrainsMonoNerd" 2>/dev/null
-            fc-cache -f "$font_dir" 2>/dev/null || true
-            ok "JetBrainsMono Nerd Font installed"
-        else
-            warn "Download failed — try installing manually from https://www.nerdfonts.com/"
-        fi
-    elif command -v wget &>/dev/null; then
-        wget -q "https://github.com/ryanoasis/nerd-fonts/releases/download/v${nerd_ver}/JetBrainsMono.tar.xz" -O "$tmpdir/JetBrainsMono.tar.xz"
-        if [ -f "$tmpdir/JetBrainsMono.tar.xz" ]; then
-            mkdir -p "$font_dir/JetBrainsMonoNerd"
-            tar -xf "$tmpdir/JetBrainsMono.tar.xz" -C "$font_dir/JetBrainsMonoNerd" 2>/dev/null
-            fc-cache -f "$font_dir" 2>/dev/null || true
-            ok "JetBrainsMono Nerd Font installed"
-        else
-            warn "Download failed — try installing manually from https://www.nerdfonts.com/"
-        fi
-    else
-        warn "Neither curl nor wget found. Install JetBrainsMono Nerd Font manually:"
-        echo "  https://www.nerdfonts.com/font-downloads"
+    if command -v yay &>/dev/null; then
+        yay -S --needed --noconfirm ttf-jetbrains-mono-nerd && {
+            ok "JetBrainsMono Nerd Font installed via yay"
+            return
+        }
     fi
 
-    rm -rf "$tmpdir"
+    warn "No AUR helper found (paru/yay). Install manually: paru -S ttf-jetbrains-mono-nerd"
 }
 
 link_config() {
@@ -206,13 +184,54 @@ setup_cache() {
     mkdir -p "$CACHE_DIR"
 }
 
+setup_runcat() {
+    local module_dir="$CONFIG_DIR/waybar/modules/runcat-text"
+
+    if [ ! -d "$DOTFILES_DIR/waybar/modules/runcat-text" ]; then
+        warn "runcat-text module not found in dotfiles — skipping"
+        return
+    fi
+
+    mkdir -p "$module_dir"
+    cp "$DOTFILES_DIR/waybar/modules/runcat-text"/* "$module_dir/"
+    ok "runcat-text module files copied"
+
+    # Install font
+    local font_dir="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"
+    mkdir -p "$font_dir"
+    if [ -f "$module_dir/runcat.ttf" ] && ! fc-list :family 2>/dev/null | grep -qi "runcat"; then
+        cp "$module_dir/runcat.ttf" "$font_dir/"
+        fc-cache -f 2>/dev/null || true
+        ok "runcat font installed"
+    else
+        ok "runcat font already installed"
+    fi
+
+    # Set up Python venv
+    if [ ! -f "$module_dir/.venv/bin/python" ]; then
+        if command -v python &>/dev/null; then
+            python -m venv "$module_dir/.venv"
+            "$module_dir/.venv/bin/pip" install -q "$module_dir/requirements.txt" 2>/dev/null || \
+                "$module_dir/.venv/bin/pip" install -q pyjson5 2>/dev/null || \
+                warn "runcat Python deps not installed (pyjson5 missing)"
+            ok "runcat Python venv created"
+        else
+            warn "python not found — runcat-text requires python"
+        fi
+    else
+        ok "runcat Python venv already exists"
+    fi
+
+    ok "runcat-text setup complete"
+}
+
 install_scripts() {
     local scripts_dir="$CONFIG_DIR/wallust"
 
     mkdir -p "$scripts_dir/templates"
 
     # Install scripts
-    for s in reload-theme.sh wallpaper-select.sh; do
+    for s in reload-theme.sh wallpaper-select.sh cache-wallpapers.sh record-fullscreen.sh record-region.sh recording-indicator.sh; do
         ln -sf "$DOTFILES_DIR/scripts/$s" "$scripts_dir/$s"
     done
     ok "wallust scripts linked"
@@ -233,6 +252,9 @@ make_executable() {
         chmod +x "$s" 2>/dev/null || true
     done
     for s in "$CONFIG_DIR/rofi/scripts"/*.sh; do
+        chmod +x "$s" 2>/dev/null || true
+    done
+    for s in "$CONFIG_DIR/wallust"/*.sh; do
         chmod +x "$s" 2>/dev/null || true
     done
     chmod +x "$CONFIG_DIR/rofi/scripts/script_wallpaper.sh" 2>/dev/null || true
@@ -260,6 +282,9 @@ link_dotfiles() {
     mkdir -p "$CONFIG_DIR/rofi/colors"
     mkdir -p "$CONFIG_DIR/rofi/launchers"
     mkdir -p "$CONFIG_DIR/rofi/scripts"
+    mkdir -p "$CONFIG_DIR/rofi/icons"
+    mkdir -p "$CONFIG_DIR/gtk-3.0"
+    mkdir -p "$CONFIG_DIR/gtk-4.0"
     # Waybar
     link_config "$DOTFILES_DIR/waybar/config.jsonc" "$CONFIG_DIR/waybar/config.jsonc" "waybar"
     link_config "$DOTFILES_DIR/waybar/style.css" "$CONFIG_DIR/waybar/style.css" "waybar"
@@ -267,7 +292,7 @@ link_dotfiles() {
     link_config "$DOTFILES_DIR/waybar/scripts/launch.sh" "$CONFIG_DIR/waybar/scripts/launch.sh" "waybar"
     link_config "$DOTFILES_DIR/waybar/scripts/media.sh" "$CONFIG_DIR/waybar/scripts/media.sh" "waybar"
     link_config "$DOTFILES_DIR/waybar/scripts/weather.sh" "$CONFIG_DIR/waybar/scripts/weather.sh" "waybar"
-    for s in system-wifi.sh system-bluetooth.sh system-audio.sh system-cpu.sh system-memory.sh power-profile.sh power-profile-switch.sh system-power.sh workspaces.sh workspace-click.sh workspace-next.sh workspace-prev.sh tui-wifi.sh tui-bluetooth.sh tui-audio.sh tui-cpu.sh record-*.sh; do
+    for s in brightness.sh notification.sh system-wifi.sh system-bluetooth.sh system-audio.sh system-cpu.sh system-memory.sh power-profile.sh power-profile-switch.sh system-power.sh workspaces.sh workspace-click.sh workspace-next.sh workspace-prev.sh tui-wifi.sh tui-bluetooth.sh tui-audio.sh tui-cpu.sh record-*.sh; do
         link_config "$DOTFILES_DIR/waybar/scripts/$s" "$CONFIG_DIR/waybar/scripts/$s" "waybar"
     done
 
@@ -281,6 +306,10 @@ link_dotfiles() {
     link_config "$DOTFILES_DIR/swaync/style.css" "$CONFIG_DIR/swaync/style.css" "swaync"
     link_config "$DOTFILES_DIR/swaync/media-swaync.sh" "$CONFIG_DIR/swaync/media-swaync.sh" "swaync"
     link_config "$DOTFILES_DIR/swaync/bt-status.sh" "$CONFIG_DIR/swaync/bt-status.sh" "swaync"
+
+    # GTK3/4 dark theme
+    link_config "$DOTFILES_DIR/gtk/gtk-3.0/settings.ini" "$CONFIG_DIR/gtk-3.0/settings.ini" "gtk3"
+    link_config "$DOTFILES_DIR/gtk/gtk-4.0/settings.ini" "$CONFIG_DIR/gtk-4.0/settings.ini" "gtk4"
 
     # Wlogout
     link_config "$DOTFILES_DIR/wlogout/style.css" "$CONFIG_DIR/wlogout/style.css" "wlogout"
@@ -305,6 +334,7 @@ link_dotfiles() {
     done
     link_config "$DOTFILES_DIR/rofi/scripts/script_wallpaper.sh" "$CONFIG_DIR/rofi/scripts/script_wallpaper.sh" "rofi"
     link_config "$DOTFILES_DIR/rofi/scripts/system-power.sh" "$CONFIG_DIR/rofi/scripts/system-power.sh" "rofi"
+    link_config "$DOTFILES_DIR/rofi/scripts/clipboard.sh" "$CONFIG_DIR/rofi/scripts/clipboard.sh" "rofi"
 
     # Cava
     link_config "$DOTFILES_DIR/cava/config" "$CONFIG_DIR/cava/config" "cava"
@@ -329,7 +359,7 @@ fix_paths() {
 
     for file in "${files[@]}"; do
         if [ -f "$file" ]; then
-            sed -i "s|/home/lucario|$HOME|g" "$file" 2>/dev/null || true
+            sed -i "s|/home/lucario|$HOME|g; s|/home/bitz|$HOME|g" "$file" 2>/dev/null || true
         fi
     done
 
@@ -427,6 +457,7 @@ install_nerd_font
 install_scripts
 link_dotfiles
 make_executable
+setup_runcat
 fix_paths
 add_keybind
 generate_initial_theme

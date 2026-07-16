@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Screen recording — region selection with internal audio
-# Created by opencode
+# Kill any existing recording first
+if pgrep -x wf-recorder > /dev/null 2>&1; then
+    pkill -x wf-recorder
+    notify-send "Recording" "Stopped"
+    exit 0
+fi
 
 DIR="$HOME/Videos/Recordings/Region"
 mkdir -p "$DIR"
-
 GEOM=$(slurp)
+
 if [ -z "$GEOM" ]; then
     notify-send "Recording" "Cancelled"
     exit 1
