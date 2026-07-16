@@ -6,10 +6,11 @@ CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 WALL_DIR="${WALLPAPER_DIR:-$HOME/Pictures/Wallpapers}"
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}"
 THEME_CACHE="$CACHE_DIR/wallust/themes"
+THUMB_DIR="$CACHE_DIR/wallust-thumbs"
 LIVE_DIR="$WALL_DIR/live"
 POLL_INTERVAL=30
 
-mkdir -p "$THEME_CACHE"
+mkdir -p "$THEME_CACHE" "$THUMB_DIR"
 
 WALLUST_OUTPUTS=(
     "waybar/style.css"
@@ -43,15 +44,24 @@ cache_wallpaper() {
     name="$(basename "$img" | sed 's/\.[^.]*$//')"
     local cache_dir="$THEME_CACHE/$name"
     local marker="$cache_dir/.done"
+    local thumb_path="$THUMB_DIR/${name}.jpg"
 
-    # Check if cache is still fresh (wallpaper mtime older than cache)
-    if [ -f "$marker" ] && [ "$(stat -c %Y "$img" 2>/dev/null)" -le "$(stat -c %Y "$marker" 2>/dev/null)" ]; then
-        return 0
+    # Generate small thumbnail for rofi grid (regardless of wallust cache freshness)
+    if [ ! -f "$thumb_path" ] && command -v convert &>/dev/null; then
+        convert "$img" -resize "200x200>" -quality 85 "$thumb_path" 2>/dev/null || true
+    fi
+
+    # Check if wallust cache is still fresh
+    if [ -f "$marker" ]; then
+        local fmtime mmtime
+        fmtime=$(stat -c %Y "$img" 2>/dev/null)
+        mmtime=$(stat -c %Y "$marker" 2>/dev/null)
+        [ -n "$fmtime" ] && [ -n "$mmtime" ] && [ "$fmtime" -le "$mmtime" ] && return 0
     fi
 
     mkdir -p "$cache_dir"
 
-    if ! wallust run "$img" --config-dir "$CONFIG_DIR/wallust" -q 2>/dev/null; then
+    if ! timeout 15 wallust run "$img" --config-dir "$CONFIG_DIR/wallust" -q 2>/dev/null; then
         return 1
     fi
 
@@ -81,8 +91,11 @@ scan_and_cache() {
             local cache_dir="$THEME_CACHE/$name"
             local marker="$cache_dir/.done"
 
-            if [ -f "$marker" ] && [ "$(stat -c %Y "$f" 2>/dev/null)" -le "$(stat -c %Y "$marker" 2>/dev/null)" ]; then
-                continue
+            if [ -f "$marker" ] && [ -f "$f" ]; then
+                local fmtime mmtime
+                fmtime=$(stat -c %Y "$f" 2>/dev/null)
+                mmtime=$(stat -c %Y "$marker" 2>/dev/null)
+                [ -n "$fmtime" ] && [ -n "$mmtime" ] && [ "$fmtime" -le "$mmtime" ] && continue
             fi
 
             if command -v ffmpeg &>/dev/null; then

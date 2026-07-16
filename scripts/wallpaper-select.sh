@@ -125,7 +125,7 @@ set_static() {
     fi
 
     if ! apply_cached_theme "$name"; then
-        wallust run "$img" --config-dir "$CONFIG_DIR/wallust" || true
+        timeout 30 wallust run "$img" --config-dir "$CONFIG_DIR/wallust" || true
         cache_current_theme "$name" || true
     fi
 
@@ -163,7 +163,7 @@ set_live() {
         if [ -f "$frame" ]; then
             ln -sf "$frame" "$CACHE_DIR/current_wallpaper.png" 2>/dev/null || true
             if ! apply_cached_theme "$name"; then
-                wallust run "$frame" --config-dir "$CONFIG_DIR/wallust" || true
+                timeout 30 wallust run "$frame" --config-dir "$CONFIG_DIR/wallust" || true
                 cache_current_theme "$name" || true
             fi
             "$CONFIG_DIR/wallust/reload-theme.sh" || true
@@ -212,7 +212,12 @@ pick_static() {
     local selected
     selected=$(
         for f in "${images[@]}"; do
-            echo -ne "$f\0icon\x1f$f\n"
+            local thumb="$THUMB_DIR/$(basename "$f" | sed 's/\.[^.]*$//').jpg"
+            if [ -f "$thumb" ]; then
+                echo -ne "$f\0icon\x1f$thumb\n"
+            else
+                echo -ne "$f\0icon\x1f$f\n"
+            fi
         done \
         | rofi -dmenu -i -p "" -theme "$ROFI_THEME" -show-icons
     )
