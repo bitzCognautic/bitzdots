@@ -13,10 +13,10 @@ choice=$(
 )
 
 case "$choice" in
-    "Lock")     hyprlock ;;
-    "Logout")   hyprctl dispatch exit ;;
-    "Sleep")    systemctl suspend ;;
-    "Reboot")   systemctl reboot ;;
-    "Shutdown") systemctl poweroff ;;
-    "Cancel"|*) exit 0 ;;
+    *Lock)     hyprlock ;;
+    *Logout)   hyprctl dispatch exit ;;
+    *Sleep)    systemctl suspend ;;
+    *Reboot)   systemctl reboot ;;
+    *Shutdown) systemctl poweroff ;;
+    *Cancel|*) exit 0 ;;
 esac
