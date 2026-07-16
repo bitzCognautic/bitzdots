@@ -49,7 +49,8 @@ install_deps() {
                 waybar swaync rofi kitty cava \
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
-                impala bluetui btop pulsemixer wf-recorder python 2>&1 | \
+                impala bluetui btop pulsemixer wf-recorder python \
+                breeze qt6ct 2>&1 | \
                 grep -o "target not found: [^']*" | cut -d' ' -f4 > /tmp/missing_pkgs.txt || true
 
 
@@ -285,6 +286,7 @@ link_dotfiles() {
     mkdir -p "$CONFIG_DIR/rofi/icons"
     mkdir -p "$CONFIG_DIR/gtk-3.0"
     mkdir -p "$CONFIG_DIR/gtk-4.0"
+    mkdir -p "$CONFIG_DIR/environment.d"
     # Waybar
     link_config "$DOTFILES_DIR/waybar/config.jsonc" "$CONFIG_DIR/waybar/config.jsonc" "waybar"
     link_config "$DOTFILES_DIR/waybar/style.css" "$CONFIG_DIR/waybar/style.css" "waybar"
@@ -344,6 +346,9 @@ link_dotfiles() {
 
     # Kitty — link config from dotfiles
     link_config "$DOTFILES_DIR/kitty/kitty.conf" "$CONFIG_DIR/kitty/kitty.conf" "kitty"
+
+    # Qt environment
+    link_config "$DOTFILES_DIR/environment.d/qt.conf" "$CONFIG_DIR/environment.d/qt.conf" "qt"
 }
 
 # ── Fix hardcoded paths ─────────────────────────────────────────

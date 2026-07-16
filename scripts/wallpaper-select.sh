@@ -39,6 +39,7 @@ WALLUST_OUTPUTS=(
     "rofi/icons/static.svg"
     "rofi/icons/live.svg"
     "kdeglobals"
+    "bitzdots.colors"
 )
 
 apply_cached_theme() {

@@ -78,7 +78,7 @@ hl.bind(S .. " + N", hl.dsp.exec_cmd("swaync-client -t"))
 hl.bind(S .. " + space", hl.dsp.exec_cmd("rofi -show drun -theme ~/.config/rofi/themes/launcher.rasi"))
 
 -- Power menu
-hl.bind(S .. " + P", hl.dsp.exec_cmd("~/.config/rofi/system-menu.sh"))
+hl.bind(S .. " + P", hl.dsp.exec_cmd("~/.config/rofi/scripts/system-power.sh"))
 
 -- Clipboard history
 hl.bind(S  .. " + V", hl.dsp.exec_cmd("~/.config/rofi/scripts/clipboard.sh"))

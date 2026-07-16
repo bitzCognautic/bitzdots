@@ -72,3 +72,6 @@ icon_live.target = "~/.config/rofi/icons/live.svg"
 
 kdeglobals.template = "kdeglobals.j2"
 kdeglobals.target = "~/.config/kdeglobals"
+
+colorscheme_bitzdots.template = "bitzdots.colors.j2"
+colorscheme_bitzdots.target = "~/.local/share/color-schemes/bitzdots.colors"
