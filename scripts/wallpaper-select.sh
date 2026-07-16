@@ -40,6 +40,7 @@ WALLUST_OUTPUTS=(
     "rofi/icons/live.svg"
     "kdeglobals"
     "bitzdots.colors"
+    "qt6ct/qt6ct.conf"
 )
 
 apply_cached_theme() {
@@ -130,14 +131,14 @@ set_static() {
 
     "$CONFIG_DIR/wallust/reload-theme.sh" || true
 
+    notify-send -i "$img" "Theme updated" "Wallpaper and colors applied"
+
     # Restart waybar to pick up new config.jsonc and CSS
     if pgrep -x waybar > /dev/null; then
         pkill -x waybar 2>/dev/null || true
         sleep 0.3
         waybar &>/dev/null &
     fi
-
-    notify-send -i "$img" "Theme updated" "Wallpaper and colors applied"
 }
 
 # ── Helper: set live wallpaper ───────────────────────────────────
@@ -167,6 +168,8 @@ set_live() {
             fi
             "$CONFIG_DIR/wallust/reload-theme.sh" || true
 
+            notify-send -i video "Live wallpaper" "$(basename "$video")"
+
             # Restart waybar to pick up new config.jsonc and CSS
             if pgrep -x waybar > /dev/null; then
                 pkill -x waybar 2>/dev/null || true
@@ -175,8 +178,7 @@ set_live() {
             fi
         fi
     fi
-
-    notify-send -i video "Live wallpaper" "$(basename "$video")"
+}
 }
 
 # ── Generate thumbnail for video ─────────────────────────────────

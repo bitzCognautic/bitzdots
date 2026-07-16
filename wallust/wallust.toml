@@ -75,3 +75,6 @@ kdeglobals.target = "~/.config/kdeglobals"
 
 colorscheme_bitzdots.template = "bitzdots.colors.j2"
 colorscheme_bitzdots.target = "~/.local/share/color-schemes/bitzdots.colors"
+
+qt6ct.template = "qt6ct.conf.j2"
+qt6ct.target = "~/.config/qt6ct/qt6ct.conf"

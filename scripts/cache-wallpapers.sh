@@ -34,6 +34,7 @@ WALLUST_OUTPUTS=(
     "rofi/icons/live.svg"
     "kdeglobals"
     "bitzdots.colors"
+    "qt6ct/qt6ct.conf"
 )
 
 cache_wallpaper() {
