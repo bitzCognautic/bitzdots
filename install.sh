@@ -50,7 +50,7 @@ install_deps() {
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
                 impala bluetui btop pulsemixer wf-recorder python \
-                breeze qt6ct 2>&1 | \
+                breeze 2>&1 | \
                 grep -o "target not found: [^']*" | cut -d' ' -f4 > /tmp/missing_pkgs.txt || true
 
 
@@ -60,6 +60,10 @@ install_deps() {
                 while IFS= read -r pkg; do
                     aur_pkgs+=("$pkg")
                 done < /tmp/missing_pkgs.txt
+                # qt6ct-kde replaces qt6ct for KDE app theming
+                if [[ " ${aur_pkgs[*]} " =~ " qt6ct " ]]; then
+                    aur_pkgs=("${aur_pkgs[@]/qt6ct/qt6ct-kde}")
+                fi
                 log "Installing AUR packages via paru: ${aur_pkgs[*]}"
                 paru -S --needed --noconfirm "${aur_pkgs[@]}"
             elif [ -s /tmp/missing_pkgs.txt ]; then

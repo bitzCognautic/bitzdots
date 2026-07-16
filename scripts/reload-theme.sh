@@ -11,6 +11,11 @@ if [ -f "$CONFIG_DIR/wallust/env" ]; then
     source "$CONFIG_DIR/wallust/env"
 fi
 
+# Fix ~ not being expanded by qt6ct in color_scheme_path
+if [ -f "$CONFIG_DIR/qt6ct/qt6ct.conf" ]; then
+    sed -i "s|^color_scheme_path=~|color_scheme_path=$HOME|" "$CONFIG_DIR/qt6ct/qt6ct.conf"
+fi
+
 # --- SwayNC : reload CSS in-place ---
 if pgrep -x swaync > /dev/null; then
     swaync-client --reload-css 2>/dev/null || swaync-client -R 2>/dev/null || true
