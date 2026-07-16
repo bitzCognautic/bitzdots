@@ -179,7 +179,6 @@ set_live() {
         fi
     fi
 }
-}
 
 # ── Generate thumbnail for video ─────────────────────────────────
 generate_thumb() {
