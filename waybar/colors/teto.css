@@ -218,11 +218,12 @@ window#waybar > box {
 #memory { color: @on_secondary_container; }
 
 /* ─── Network ─────────────────────────────────────────── */
-#network.disconnected {
+#network label.disabled,
+#network label.disconnected {
   opacity: 0.35;
 }
-#network.linked,
-#network.ethernet {
+#network label.linked,
+#network label.ethernet {
   color: @tertiary;
 }
 
@@ -242,15 +243,12 @@ window#waybar > box {
   color: @primary;
   border-color: alpha(@primary, 0.4);
 }
-#bluetooth.disabled,
-#bluetooth.off {
+#bluetooth label.disabled,
+#bluetooth label.off {
   opacity: 0.5;
-}
-#bluetooth.disabled label,
-#bluetooth.off label {
   text-decoration: line-through;
 }
-#bluetooth.on {
+#bluetooth label.on {
   opacity: 0.35;
 }
 

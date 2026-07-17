@@ -100,8 +100,14 @@ tooltip label {
     color: @on_surface_variant;
 }
 
-#network.disconnected {
+#network label.disabled,
+#network label.disconnected {
     opacity: 0.35;
+}
+
+#network label.linked,
+#network label.ethernet {
+    color: @tertiary;
 }
 
 #network:hover {
@@ -114,7 +120,13 @@ tooltip label {
     color: @on_surface_variant;
 }
 
-#bluetooth.disabled {
+#bluetooth label.disabled,
+#bluetooth label.off {
+    opacity: 0.5;
+    text-decoration: line-through;
+}
+
+#bluetooth label.on {
     opacity: 0.35;
 }
 
