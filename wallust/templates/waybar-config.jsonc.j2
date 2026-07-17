@@ -19,7 +19,10 @@
   },
 
   "custom/media-prev": {
-    "format": "󰒮",
+    "exec": "~/.config/waybar/scripts/media-control.sh prev",
+    "return-type": "json",
+    "interval": 1,
+    "hide-empty-text": true,
     "on-click": "playerctl previous",
     "tooltip": false
   },
@@ -36,7 +39,10 @@
   },
 
   "custom/media-next": {
-    "format": "󰒭",
+    "exec": "~/.config/waybar/scripts/media-control.sh next",
+    "return-type": "json",
+    "interval": 1,
+    "hide-empty-text": true,
     "on-click": "playerctl next",
     "tooltip": false
   },
