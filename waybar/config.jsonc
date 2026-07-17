@@ -18,6 +18,12 @@
     "spacing": 8
   },
 
+  "custom/media-prev": {
+    "format": "󰒮",
+    "on-click": "playerctl previous",
+    "tooltip": false
+  },
+
   "custom/media": {
     "exec": "~/.config/waybar/scripts/media.sh",
     "return-type": "json",
@@ -27,6 +33,12 @@
     "on-click-right": "playerctl stop",
     "on-scroll-up": "playerctl next",
     "on-scroll-down": "playerctl previous"
+  },
+
+  "custom/media-next": {
+    "format": "󰒭",
+    "on-click": "playerctl next",
+    "tooltip": false
   },
 
   "custom/runcat": {
