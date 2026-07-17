@@ -50,7 +50,7 @@ install_deps() {
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
                 impala bluetui btop pulsemixer wf-recorder python \
-                breeze inotify-tools 2>&1 | \
+                python-gobject power-profiles-daemon breeze inotify-tools 2>&1 | \
                 grep -o "target not found: [^']*" | cut -d' ' -f4 > /tmp/missing_pkgs.txt || true
 
 
@@ -301,7 +301,7 @@ link_dotfiles() {
     link_config "$DOTFILES_DIR/waybar/scripts/launch.sh" "$CONFIG_DIR/waybar/scripts/launch.sh" "waybar"
     link_config "$DOTFILES_DIR/waybar/scripts/media.sh" "$CONFIG_DIR/waybar/scripts/media.sh" "waybar"
     link_config "$DOTFILES_DIR/waybar/scripts/weather.sh" "$CONFIG_DIR/waybar/scripts/weather.sh" "waybar"
-    for s in brightness.sh notification.sh system-wifi.sh system-bluetooth.sh system-audio.sh system-cpu.sh system-memory.sh power-profile.sh power-profile-switch.sh system-power.sh workspaces.sh workspace-click.sh workspace-next.sh workspace-prev.sh media-control.sh tui-wifi.sh tui-bluetooth.sh tui-audio.sh tui-cpu.sh record-*.sh; do
+    for s in brightness.sh notification.sh system-wifi.sh system-bluetooth.sh system-audio.sh system-cpu.sh system-memory.sh power-profile.sh power-profile-switch.sh system-power.sh workspaces.sh workspace-click.sh workspace-next.sh workspace-prev.sh tui-wifi.sh tui-bluetooth.sh tui-audio.sh tui-cpu.sh record-*.sh; do
         link_config "$DOTFILES_DIR/waybar/scripts/$s" "$CONFIG_DIR/waybar/scripts/$s" "waybar"
     done
 

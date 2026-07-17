@@ -10,21 +10,12 @@
   "margin-bottom": 0,
   "reload_style_on_change": true,
 
-  "modules-left": ["custom/workspaces", "custom/runcat", "custom/media-prev", "custom/media", "custom/media-next"],
+  "modules-left": ["custom/workspaces", "custom/runcat", "custom/media"],
   "modules-center": ["clock"],
   "modules-right": ["tray", "custom/recording", "custom/brightness", "pulseaudio", "cpu", "memory", "custom/power-profiles", "custom/notification", "network", "bluetooth", "custom/power"],
 
   "tray": {
     "spacing": 8
-  },
-
-  "custom/media-prev": {
-    "exec": "~/.config/waybar/scripts/media-control.sh prev",
-    "return-type": "json",
-    "interval": 1,
-    "hide-empty-text": true,
-    "on-click": "playerctl previous",
-    "tooltip": false
   },
 
   "custom/media": {

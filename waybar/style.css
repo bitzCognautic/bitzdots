@@ -88,23 +88,6 @@ tooltip label {
     color: @on_surface_variant;
 }
 
-#custom-media-prev,
-#custom-media-next {
-    padding: 0 6px;
-    color: @on_surface_variant;
-}
-
-#custom-media-prev.playing,
-#custom-media-next.playing {
-    color: @primary;
-}
-
-#custom-media-prev.paused,
-#custom-media-next.paused {
-    color: @on_surface_variant;
-    opacity: 0.5;
-}
-
 #network {
     padding: 0 10px;
     margin: 0 2px;

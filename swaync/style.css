@@ -119,16 +119,11 @@ button.toggle:checked {
   border-radius: var(--border-radius);
   background: rgba(37,40,39, 0.95);
   border: 1px solid var(--border-color);
-  padding: 8px 16px;
 }
 
 .notification .title {
   font-weight: bold;
   font-size: 15px;
-}
-
-.notification:hover {
-  background: rgba(132,145,148, 0.97);
 }
 
 .notification .body {
