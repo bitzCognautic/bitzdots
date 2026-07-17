@@ -61,7 +61,19 @@ cache_wallpaper() {
 
     mkdir -p "$cache_dir"
 
-    if ! timeout 10 wallust run "$img" --config-dir "$CONFIG_DIR/wallust" -q 2>/dev/null; then
+    # Backup current theme so we can restore after caching
+    local backup_dir
+    backup_dir=$(mktemp -d /tmp/wallust-cache-backup-XXXXXX)
+    for output in "${WALLUST_OUTPUTS[@]}"; do
+        local src="$CONFIG_DIR/$output"
+        if [ -f "$src" ]; then
+            mkdir -p "$(dirname "$backup_dir/$output")"
+            cp "$src" "$backup_dir/$output"
+        fi
+    done
+
+    if ! timeout 30 wallust run "$img" --config-dir "$CONFIG_DIR/wallust" -q 2>/dev/null; then
+        restore_backup "$backup_dir"
         return 1
     fi
 
@@ -74,6 +86,22 @@ cache_wallpaper() {
     done
 
     touch "$marker"
+
+    # Restore the user's active theme
+    restore_backup "$backup_dir"
+}
+
+restore_backup() {
+    local backup_dir="$1"
+    for output in "${WALLUST_OUTPUTS[@]}"; do
+        local src="$backup_dir/$output"
+        local dst="$CONFIG_DIR/$output"
+        if [ -f "$src" ]; then
+            mkdir -p "$(dirname "$dst")"
+            cp "$src" "$dst"
+        fi
+    done
+    rm -rf "$backup_dir"
 }
 
 scan_and_cache() {

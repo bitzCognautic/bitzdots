@@ -43,6 +43,39 @@ WALLUST_OUTPUTS=(
     "qt6ct/qt6ct.conf"
 )
 
+backup_theme() {
+    local backup_dir="$CACHE_DIR/wallust-backup"
+    rm -rf "$backup_dir"
+    for output in "${WALLUST_OUTPUTS[@]}"; do
+        local src="$CONFIG_DIR/$output"
+        if [ -f "$src" ]; then
+            local dst="$backup_dir/$output"
+            mkdir -p "$(dirname "$dst")"
+            cp "$src" "$dst"
+        fi
+    done
+}
+
+restore_theme() {
+    local backup_dir="$CACHE_DIR/wallust-backup"
+    if [ ! -d "$backup_dir" ]; then
+        return
+    fi
+    for output in "${WALLUST_OUTPUTS[@]}"; do
+        local src="$backup_dir/$output"
+        local dst="$CONFIG_DIR/$output"
+        if [ -f "$src" ]; then
+            mkdir -p "$(dirname "$dst")"
+            cp "$src" "$dst"
+        fi
+    done
+    rm -rf "$backup_dir"
+}
+
+clear_backup() {
+    rm -rf "$CACHE_DIR/wallust-backup"
+}
+
 apply_cached_theme() {
     local name="$1"
     local cache_dir="$THEME_CACHE/$name"
@@ -126,8 +159,15 @@ set_static() {
 
     if ! apply_cached_theme "$name"; then
         notify-send -i "$img" "Generating theme..." "Calculating color palette..."
-        timeout 10 wallust run "$img" --config-dir "$CONFIG_DIR/wallust" || true
-        cache_current_theme "$name" || true
+        backup_theme
+        if timeout 30 wallust run "$img" --config-dir "$CONFIG_DIR/wallust"; then
+            cache_current_theme "$name" || true
+            clear_backup
+        else
+            restore_theme
+            notify-send -u critical "Theme generation failed" "Could not generate colors for this wallpaper"
+            return 1
+        fi
     fi
 
     "$CONFIG_DIR/wallust/reload-theme.sh" || true
@@ -165,8 +205,15 @@ set_live() {
             ln -sf "$frame" "$CACHE_DIR/current_wallpaper.png" 2>/dev/null || true
             if ! apply_cached_theme "$name"; then
                 notify-send -i video "Generating theme..." "Calculating color palette..."
-                timeout 10 wallust run "$frame" --config-dir "$CONFIG_DIR/wallust" || true
-                cache_current_theme "$name" || true
+                backup_theme
+                if timeout 30 wallust run "$frame" --config-dir "$CONFIG_DIR/wallust"; then
+                    cache_current_theme "$name" || true
+                    clear_backup
+                else
+                    restore_theme
+                    notify-send -u critical "Theme generation failed" "Could not generate colors for this wallpaper"
+                    return 1
+                fi
             fi
             "$CONFIG_DIR/wallust/reload-theme.sh" || true
 

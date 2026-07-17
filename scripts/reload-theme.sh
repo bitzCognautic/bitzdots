@@ -13,7 +13,7 @@ fi
 
 # Fix ~ not being expanded by qt6ct in color_scheme_path
 if [ -f "$CONFIG_DIR/qt6ct/qt6ct.conf" ]; then
-    sed -i "s|^color_scheme_path=~|color_scheme_path=$HOME|" "$CONFIG_DIR/qt6ct/qt6ct.conf"
+    sed -i "s|^color_scheme_path=~|color_scheme_path=$HOME|" "$CONFIG_DIR/qt6ct/qt6ct.conf" 2>/dev/null || true
 fi
 
 # --- SwayNC : reload CSS in-place ---
@@ -24,9 +24,9 @@ fi
 
 # --- Hyprland border colors: update via eval (avoids full config reload) ---
 if command -v hyprctl &>/dev/null && [ -f "$CONFIG_DIR/hypr/colors.lua" ]; then
-    c1=$(grep "color1" "$CONFIG_DIR/hypr/colors.lua" | head -1 | sed "s/.*= \"\(.*\)\",/\1/")
-    c4=$(grep "color4" "$CONFIG_DIR/hypr/colors.lua" | head -1 | sed "s/.*= \"\(.*\)\",/\1/")
-    c8=$(grep "color8" "$CONFIG_DIR/hypr/colors.lua" | head -1 | sed "s/.*= \"\(.*\)\",/\1/")
+    c1=$(grep "color1" "$CONFIG_DIR/hypr/colors.lua" | head -1 | sed "s/.*= \"\(.*\)\",/\1/" || true)
+    c4=$(grep "color4" "$CONFIG_DIR/hypr/colors.lua" | head -1 | sed "s/.*= \"\(.*\)\",/\1/" || true)
+    c8=$(grep "color8" "$CONFIG_DIR/hypr/colors.lua" | head -1 | sed "s/.*= \"\(.*\)\",/\1/" || true)
     [ -n "$c1" ] && [ -n "$c4" ] && hyprctl eval "hl.config({ general = { col = { active_border = { colors = {\"rgba(${c1}ee)\", \"rgba(${c4}ee)\"}, angle = 45 }, inactive_border = \"rgba(${c8}ee)\" } } })" &>/dev/null || true
     echo "   Hyprland border colors updated"
 fi
