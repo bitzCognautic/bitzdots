@@ -63,6 +63,7 @@ cache_dir_for() {
 }
 
 marker_for()   { echo "$(cache_dir_for "$1")/.done"; }
+skip_marker_for() { echo "$(cache_dir_for "$1")/.skip"; }
 thumb_for()    { echo "$THUMB_DIR/$(basename "$1" | sed 's/\.[^.]*$//').jpg"; }
 
 # Does a complete, valid cache exist?
@@ -87,6 +88,31 @@ cache_valid() {
     [ -f "$thumb" ] || return 1
 
     return 0
+}
+
+# Skip cache generation for images that persistently fail.
+# Uses a cooldown: after failure, skip retries for 24 hours.
+is_skipped() {
+    local img="$1"
+    local skip; skip=$(skip_marker_for "$img")
+    [ -f "$skip" ] || return 1
+    local skip_time now
+    skip_time=$(stat -c %Y "$skip" 2>/dev/null) || return 1
+    now=$(date +%s)
+    [ $((now - skip_time)) -lt 86400 ] || return 1
+    return 0
+}
+
+mark_skipped() {
+    local img="$1"
+    local skip; skip=$(skip_marker_for "$img")
+    mkdir -p "$(dirname "$skip")"
+    touch "$skip"
+}
+
+clear_skip() {
+    local img="$1"
+    rm -f "$(skip_marker_for "$img")"
 }
 
 # Extract a single frame from a video for wallust colour extraction
@@ -176,6 +202,11 @@ process_one() {
 
     is_supported "$path" || return 0
 
+    # If image is in cooldown (failed before), skip until the file changes
+    if is_skipped "$path"; then
+        return 0
+    fi
+
     generate_thumbnail "$path"
 
     if cache_valid "$path"; then
@@ -190,18 +221,22 @@ process_one() {
             local frame
             frame=$(extract_frame "$src") || {
                 err "failed to extract frame from $src"
+                mark_skipped "$path"
                 return 1
             }
             src="$frame"
         else
             warn "ffmpeg not available — skipping $src"
+            mark_skipped "$path"
             return 1
         fi
     fi
 
     if generate_palette "$src"; then
+        clear_skip "$path"
         log "generated palette for $(basename "$path")"
     else
+        mark_skipped "$path"
         err "failed to generate palette for $(basename "$path")"
     fi
 
@@ -251,6 +286,8 @@ debounce_and_process() {
     done
 
     for path in "${!seen[@]}"; do
+        # Clear skip marker — file was just added/modified, so retry even if previously failed
+        clear_skip "$path"
         process_one "$path"
     done
 }
@@ -268,6 +305,9 @@ startup() {
     }
 
     log "daemon started"
+
+    # Remove stale skip markers older than 7 days
+    find "$THEME_CACHE" -name '.skip' -mtime +7 -delete 2>/dev/null || true
 
     scan_all
 }
