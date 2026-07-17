@@ -61,7 +61,7 @@ cache_wallpaper() {
 
     mkdir -p "$cache_dir"
 
-    if ! timeout 15 wallust run "$img" --config-dir "$CONFIG_DIR/wallust" -q 2>/dev/null; then
+    if ! timeout 10 wallust run "$img" --config-dir "$CONFIG_DIR/wallust" -q 2>/dev/null; then
         return 1
     fi
 

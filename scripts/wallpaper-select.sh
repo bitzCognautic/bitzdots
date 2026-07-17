@@ -125,7 +125,8 @@ set_static() {
     fi
 
     if ! apply_cached_theme "$name"; then
-        timeout 30 wallust run "$img" --config-dir "$CONFIG_DIR/wallust" || true
+        notify-send -i "$img" "Generating theme..." "Calculating color palette..."
+        timeout 10 wallust run "$img" --config-dir "$CONFIG_DIR/wallust" || true
         cache_current_theme "$name" || true
     fi
 
@@ -163,7 +164,8 @@ set_live() {
         if [ -f "$frame" ]; then
             ln -sf "$frame" "$CACHE_DIR/current_wallpaper.png" 2>/dev/null || true
             if ! apply_cached_theme "$name"; then
-                timeout 30 wallust run "$frame" --config-dir "$CONFIG_DIR/wallust" || true
+                notify-send -i video "Generating theme..." "Calculating color palette..."
+                timeout 10 wallust run "$frame" --config-dir "$CONFIG_DIR/wallust" || true
                 cache_current_theme "$name" || true
             fi
             "$CONFIG_DIR/wallust/reload-theme.sh" || true
