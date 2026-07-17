@@ -3,8 +3,8 @@ CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 [ -f "$CONFIG_DIR/wallust/env" ] && source "$CONFIG_DIR/wallust/env"
 
 generate_state() {
-    active=$(hyprctl activeworkspace -j 2>/dev/null | jq -r '.id')
-    clients=$(hyprctl clients -j 2>/dev/null | jq -r '.[].workspace.id' | sort -nu)
+    active=$(timeout 3 hyprctl activeworkspace -j 2>/dev/null | timeout 3 jq -r '.id')
+    clients=$(timeout 3 hyprctl clients -j 2>/dev/null | timeout 3 jq -r '.[].workspace.id' | sort -nu)
 
     color_active="#${WALLUST_FG:-FDF9EB}"
     color_occupied="#${WALLUST_COLOR6:-BBB394}"
@@ -57,13 +57,14 @@ while read -r _; do
     generate_state
 done < <(
     python3 -u -c "
-import socket, sys
+import socket, sys, time
 s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 try:
     s.connect('$socket')
 except Exception:
     sys.exit(0)
 buf = ''
+last = 0
 while True:
     try:
         data = s.recv(4096)
@@ -76,7 +77,14 @@ while True:
         line, buf = buf.split('\n', 1)
         event = line.split('>>')[0]
         if event in ('workspace', 'focusedmon', 'openwindow', 'closewindow', 'movewindow', 'createworkspace', 'destroyworkspace'):
-            sys.stdout.write('x\n')
-            sys.stdout.flush()
+            now = time.monotonic()
+            if now - last < 0.2:
+                continue
+            last = now
+            try:
+                sys.stdout.write('x\n')
+                sys.stdout.flush()
+            except BrokenPipeError:
+                sys.exit(0)
 "
 )
