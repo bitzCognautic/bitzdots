@@ -86,7 +86,7 @@
     "format-no-controller": "",
     "format-icons": ["\uDB80\uDCAF", "\uDB80\uDCB1", "\uDB80\uDCB2"],
     "tooltip-format": "Devices connected: {num_connections}",
-    "on-click": "kitty --class system-tui -e bluetui"
+    "on-click": "~/.config/waybar/scripts/tui-bluetooth.sh"
   },
 
   "pulseaudio": {
