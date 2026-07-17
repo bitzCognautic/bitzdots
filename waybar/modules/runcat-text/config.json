@@ -6,7 +6,7 @@
         "fps_h": 15
     },
     "cpu": {
-        "interval": 3,
+        "interval": 1,
         "states": {
             "high": 90,
             "medium": 40,
