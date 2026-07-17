@@ -12,6 +12,7 @@
   "control-center-height": 700,
   "control-center-width": 340,
   "transition-time": 0,
+  "timeout": 3,
   "hide-on-clear": false,
   
   "widgets": [

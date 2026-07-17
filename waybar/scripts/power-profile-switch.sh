@@ -9,6 +9,6 @@ case "$current" in
     *)           next="balanced" ;;
 esac
 
-busctl call net.hadess.PowerProfiles /net/hadess/PowerProfiles net.hadess.PowerProfiles ProfileActive s "$next" 2>/dev/null &&
+busctl set-property net.hadess.PowerProfiles /net/hadess/PowerProfiles net.hadess.PowerProfiles ActiveProfile s "$next" 2>/dev/null &&
 notify-send "Power Profile" "Switched to $next" ||
 notify-send -u critical "Power Profile" "Failed to switch"
