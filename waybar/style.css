@@ -100,7 +100,6 @@ tooltip label {
     color: @on_surface_variant;
 }
 
-#network label.disabled,
 #network label.disconnected {
     opacity: 0.35;
 }
@@ -123,7 +122,6 @@ tooltip label {
 #bluetooth label.disabled,
 #bluetooth label.off {
     opacity: 0.5;
-    text-decoration: line-through;
 }
 
 #bluetooth label.on {

@@ -218,7 +218,6 @@ window#waybar > box {
 #memory { color: @on_secondary_container; }
 
 /* ─── Network ─────────────────────────────────────────── */
-#network label.disabled,
 #network label.disconnected {
   opacity: 0.35;
 }
@@ -246,7 +245,6 @@ window#waybar > box {
 #bluetooth label.disabled,
 #bluetooth label.off {
   opacity: 0.5;
-  text-decoration: line-through;
 }
 #bluetooth label.on {
   opacity: 0.35;
