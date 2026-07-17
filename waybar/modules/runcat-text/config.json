@@ -3,10 +3,10 @@
     "return-type": "json",
     "ui": {
         "fps_l": 6,
-        "fps_h": 90
+        "fps_h": 15
     },
     "cpu": {
-        "interval": 1,
+        "interval": 3,
         "states": {
             "high": 90,
             "medium": 40,
