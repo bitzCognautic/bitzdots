@@ -22,6 +22,7 @@
     "exec": "~/.config/waybar/scripts/media.sh",
     "return-type": "json",
     "tooltip": true,
+    "exec-on-event": false,
     "on-click": "playerctl play-pause",
     "on-click-right": "playerctl stop",
     "on-scroll-up": "playerctl next",
@@ -31,15 +32,15 @@
   "custom/runcat": {
     "exec": "~/.config/waybar/modules/runcat-text/.venv/bin/python ~/.config/waybar/modules/runcat-text/main.py",
     "return-type": "json",
-    "restart-interval": 10,
-    "tooltip": true
+    "tooltip": true,
+    "exec-on-event": false
   },
 
   "custom/workspaces": {
     "exec": "~/.config/waybar/scripts/workspaces.sh",
     "return-type": "json",
     "markup": "pango",
-    "restart-interval": 5,
+    "interval": 0.5,
     "on-scroll-up": "~/.config/waybar/scripts/workspace-prev.sh",
     "on-scroll-down": "~/.config/waybar/scripts/workspace-next.sh",
     "on-click": "~/.config/waybar/scripts/workspace-click.sh"
