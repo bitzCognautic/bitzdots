@@ -1,6 +1,7 @@
 #!/bin/bash
-# Background wallpaper color cache daemon
-# Pre-generates wallust color schemes so theme switching is instant
+# One-shot wallpaper palette cache generator
+# Pre-generates wallust color schemes so theme switching is instant.
+# The event-driven daemon is wallust-cache-daemon.sh (systemd service).
 
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 WALL_DIR="${WALLPAPER_DIR:-$HOME/Pictures/Wallpapers}"
@@ -8,7 +9,6 @@ CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}"
 THEME_CACHE="$CACHE_DIR/wallust/themes"
 THUMB_DIR="$CACHE_DIR/wallust-thumbs"
 LIVE_DIR="$WALL_DIR/live"
-POLL_INTERVAL=30
 
 mkdir -p "$THEME_CACHE" "$THUMB_DIR"
 
@@ -140,12 +140,7 @@ scan_and_cache() {
     return 0
 }
 
-# Daemon mode — loop forever
-if [ "${1:-}" = "--daemon" ]; then
-    while true; do
-        scan_and_cache
-        sleep "$POLL_INTERVAL"
-    done
-else
-    scan_and_cache
-fi
+# Daemon mode was removed — use wallust-cache-daemon.sh instead (systemd service).
+# This script is kept for manual one-shot caching:
+#   ~/.config/wallust/cache-wallpapers.sh
+scan_and_cache

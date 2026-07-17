@@ -235,8 +235,9 @@ install_scripts() {
 
     mkdir -p "$scripts_dir/templates"
 
-    # Install scripts
-    for s in reload-theme.sh wallpaper-select.sh cache-wallpapers.sh record-fullscreen.sh record-region.sh recording-indicator.sh; do
+    # Install scripts — note: cache-wallpapers.sh is kept for manual use,
+    # the --daemon mode has been replaced by wallust-cache-daemon.sh
+    for s in reload-theme.sh wallpaper-select.sh cache-wallpapers.sh wallust-cache-daemon.sh record-fullscreen.sh record-region.sh recording-indicator.sh; do
         ln -sf "$DOTFILES_DIR/scripts/$s" "$scripts_dir/$s"
     done
     ok "wallust scripts linked"
@@ -470,6 +471,15 @@ setup_runcat
 fix_paths
 add_keybind
 generate_initial_theme
+
+# Install systemd user service for cache daemon
+log "Installing systemd user service..."
+mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
+cp "$DOTFILES_DIR/systemd/user/wallust-cache-daemon.service" \
+   "${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user/wallust-cache-daemon.service"
+systemctl --user daemon-reload 2>/dev/null || true
+systemctl --user enable --now wallust-cache-daemon.service 2>/dev/null || true
+ok "wallust-cache-daemon systemd service installed and started"
 
 echo ""
 echo -e "${GREEN}╔══════════════════════════════════╗${NC}"

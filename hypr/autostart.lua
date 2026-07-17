@@ -9,6 +9,6 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("awww-daemon")
     hl.exec_cmd("bash -c 'sleep 0.5 && test -f $HOME/.cache/current_wallpaper.png && awww img $HOME/.cache/current_wallpaper.png'")
 
-    -- Pre-cache wallust colors for all wallpapers (runs in background)
-    hl.exec_cmd("bash -c '~/.config/wallust/cache-wallpapers.sh --daemon &'")
+    -- Wallust palette cache daemon runs as a systemd user service
+    -- (wallust-cache-daemon.service) — no need to start it here
 end)
