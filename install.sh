@@ -50,7 +50,7 @@ install_deps() {
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
                 impala bluetui btop pulsemixer wf-recorder python \
-                breeze 2>&1 | \
+                breeze inotify-tools 2>&1 | \
                 grep -o "target not found: [^']*" | cut -d' ' -f4 > /tmp/missing_pkgs.txt || true
 
 
@@ -80,7 +80,8 @@ install_deps() {
             sudo dnf install -y \
                 waybar swaync wlogout rofi kitty cava \
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
-                polkit-kde-agent grim slurp cliphist hyprlock ffmpeg
+                polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
+                inotify-tools
             # Install wallust from crates.io
             if ! command -v wallust &>/dev/null; then
                 warn "wallust not in repos, installing via cargo..."
@@ -92,7 +93,8 @@ install_deps() {
             sudo apt install -y \
                 waybar swaync wlogout rofi kitty cava \
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
-                polkit-kde-agent grim slurp cliphist hyprlock ffmpeg
+                polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
+                inotify-tools
             if ! command -v wallust &>/dev/null; then
                 warn "wallust not in repos, installing via cargo..."
                 cargo install wallust
@@ -104,7 +106,7 @@ install_deps() {
             echo "  programs.waybar.enable = true;"
             echo "  programs.rofi.enable = true;"
             echo "  environment.systemPackages = with pkgs; ["
-            echo "    wallust swaync wlogout kitty cava"
+            echo "    wallust swaync wlogout kitty cava inotify-tools"
             echo "    hyprpicker wl-clipboard playerctl pavucontrol"
             echo "    polkit-kde-agent grim slurp cliphist hyprlock ffmpeg"
             echo "  ];"
@@ -115,7 +117,7 @@ install_deps() {
             echo "  - waybar, swaync, wlogout, rofi, kitty, cava"
             echo "  - awww, hyprpicker, wl-clipboard, playerctl"
             echo "  - pavucontrol, polkit-kde-agent, grim, slurp, cliphist"
-            echo "  - hyprlock, ffmpeg"
+            echo "  - hyprlock, ffmpeg, inotify-tools"
             ;;
     esac
 }
