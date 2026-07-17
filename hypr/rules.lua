@@ -108,19 +108,13 @@ hl.window_rule({
 })
 
 hl.window_rule({
-    name    = "kitty-opacity",
-    match   = { class = "^kitty$" },
-    opacity = "0.95 override 0.9 override",
-})
-
-hl.window_rule({
-    name    = "alacritty-opacity",
-    match   = { class = "^Alacritty$" },
-    opacity = "0.95 override 0.9 override",
-})
-
-hl.window_rule({
     name           = "suppress-maximize",
     match          = { class = ".*" },
     suppress_event = "maximize",
+})
+
+hl.window_rule({
+    name   = "all-opacity",
+    match  = { class = ".*" },
+    opacity = "0.95 override 0.85 override",
 })

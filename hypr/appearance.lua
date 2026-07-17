@@ -27,13 +27,13 @@ hl.config({
     },
     decoration = {
         rounding           = 0,
-        active_opacity     = 1.0,
-        inactive_opacity   = 0.9,
+        active_opacity     = 0.95,
+        inactive_opacity   = 0.85,
         fullscreen_opacity = 1.0,
         blur = {
             enabled            = true,
-            size               = 8,
-            passes             = 3,
+            size               = 10,
+            passes             = 4,
             ignore_opacity     = false,
             new_optimizations  = true,
             contrast           = 0.9,
