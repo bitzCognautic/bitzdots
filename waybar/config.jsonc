@@ -39,7 +39,7 @@
     "exec": "~/.config/waybar/scripts/workspaces.sh",
     "return-type": "json",
     "markup": "pango",
-    "interval": 0.5,
+    "restart-interval": 5,
     "on-scroll-up": "~/.config/waybar/scripts/workspace-prev.sh",
     "on-scroll-down": "~/.config/waybar/scripts/workspace-next.sh",
     "on-click": "~/.config/waybar/scripts/workspace-click.sh"
