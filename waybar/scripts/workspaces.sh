@@ -1,12 +1,6 @@
 #!/bin/bash
-# Output workspace state as formatted text for Waybar custom/workspaces
-# Fixed-width columns (5 chars each) for horizontal position tracking
-# Writes pixel-offset cache for workspace-click.sh
-
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
-if [ -f "$CONFIG_DIR/wallust/env" ]; then
-    source "$CONFIG_DIR/wallust/env"
-fi
+[ -f "$CONFIG_DIR/wallust/env" ] && source "$CONFIG_DIR/wallust/env"
 
 active=$(hyprctl activeworkspace -j 2>/dev/null | jq -r '.id')
 clients=$(hyprctl clients -j 2>/dev/null | jq -r '.[].workspace.id' | sort -nu)
@@ -19,7 +13,6 @@ start=$(( (active - 1) / 5 * 5 + 1 ))
 end=$(( start + 4 ))
 CELL_W=5
 FONT_SIZE=12
-# Approximate pixel width per character for monospace font
 CHAR_W=$(awk "BEGIN { printf \"%.2f\", $FONT_SIZE * 0.6 }" 2>/dev/null || echo 7.2)
 CELL_PX=$(awk "BEGIN { printf \"%d\", $CELL_W * $CHAR_W }" 2>/dev/null || echo 36)
 

@@ -39,7 +39,7 @@
     "exec": "~/.config/waybar/scripts/workspaces.sh",
     "return-type": "json",
     "markup": "pango",
-    "interval": 0.2,
+    "interval": 0.5,
     "on-scroll-up": "~/.config/waybar/scripts/workspace-prev.sh",
     "on-scroll-down": "~/.config/waybar/scripts/workspace-next.sh",
     "on-click": "~/.config/waybar/scripts/workspace-click.sh"
@@ -61,7 +61,7 @@
       "mode": "month",
       "on-scroll": 1,
       "format": {
-        "today": "<span color='#4D5655'><b><u>{}</u></b></span>"
+        "today": "<span color='#575655'><b><u>{}</u></b></span>"
       }
     }
   },
@@ -72,7 +72,7 @@
     "format-icons": ["\uDB82\uDD1F", "\uDB82\uDD22", "\uDB82\uDD25", "\uDB82\uDD28"],
     "format-ethernet": "\uDB80\uDE00",
     "format-disabled": "\uDB82\uDD2E",
-    "format-disconnected": "\uDB82\uDD1F",
+    "format-disconnected": "\uDB82\uDD2E",
     "tooltip-format-wifi": "{essid} ({signalStrength}%)",
     "tooltip-format-ethernet": "Connected",
     "tooltip-format-disconnected": "Disconnected",
