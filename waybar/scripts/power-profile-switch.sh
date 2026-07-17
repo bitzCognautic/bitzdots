@@ -4,12 +4,17 @@ if ! command -v powerprofilesctl &>/dev/null || ! powerprofilesctl get &>/dev/nu
     exit 0
 fi
 
+profiles=$(powerprofilesctl list 2>/dev/null | grep -o '^  [a-z-]*' | tr -d ' ')
 current=$(powerprofilesctl get 2>/dev/null)
-case "$current" in
-    performance) next="power-saver" ;;
-    power-saver) next="balanced" ;;
-    balanced)    next="performance" ;;
-    *)           next="balanced" ;;
-esac
 
-powerprofilesctl set "$next" 2>/dev/null && notify-send "Power Profile" "Switched to $next" || notify-send -u critical "Power Profile" "Failed to switch"
+next=""
+found=0
+for p in $profiles; do
+    if [ "$found" = "1" ]; then
+        next="$p"; break
+    fi
+    [ "$p" = "$current" ] && found=1
+done
+[ -z "$next" ] && next=$(echo "$profiles" | head -1)
+
+powerprofilesctl set "$next" 2>/dev/null && notify-send "Power Profile" "$current → $next" || notify-send -u critical "Power Profile" "Failed to switch"
