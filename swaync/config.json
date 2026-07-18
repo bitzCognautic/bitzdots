@@ -27,8 +27,8 @@
   "widget-config": {
     "mpris": {
       "autohide": true,
-      "show-album-art": "always",
-      "image-size": 64,
+      "show-album-art": "notification",
+      "image-size": 48,
       "image-radius": 8,
       "max-title-length": 40
     },
