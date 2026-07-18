@@ -23,10 +23,10 @@
   </p>
 
   <p>
-    <a href="https://github.com/bitzCognautic/dots">
+    <a href="https://github.com/bitzCognautic/bitzdots">
       <img src="ss/ss1.png" alt="Screenshot 1" width="45%">
     </a>
-    <a href="https://github.com/bitzCognautic/dots">
+    <a href="https://github.com/bitzCognautic/bitzdots">
       <img src="ss/ss2.png" alt="Screenshot 2" width="45%">
     </a>
   </p>
@@ -56,7 +56,7 @@ Built for **low-end hardware** without sacrificing usability. The full stack (Hy
 ## Quick Start
 
 ```bash
-git clone https://github.com/bitzCognautic/dots.git ~/.config/bitzdots
+git clone https://github.com/bitzCognautic/bitzdots.git ~/.config/bitzdots
 cd ~/.config/bitzdots
 chmod +x install.sh
 

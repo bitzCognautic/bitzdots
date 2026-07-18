@@ -5,7 +5,7 @@ bitzdots supports Arch Linux, Fedora, Debian/Ubuntu, and NixOS. Choose your meth
 ## Automated Install (Recommended)
 
 ```bash
-git clone https://github.com/bitzCognautic/dots.git ~/.config/bitzdots
+git clone https://github.com/bitzCognautic/bitzdots.git ~/.config/bitzdots
 cd ~/.config/bitzdots
 chmod +x install.sh
 
