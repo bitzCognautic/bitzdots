@@ -29,15 +29,6 @@
     "on-scroll-down": "playerctl previous"
   },
 
-  "custom/media-next": {
-    "exec": "~/.config/waybar/scripts/media-control.sh next",
-    "return-type": "json",
-    "interval": 1,
-    "hide-empty-text": true,
-    "on-click": "playerctl next",
-    "tooltip": false
-  },
-
   "custom/runcat": {
     "exec": "/usr/sbin/python -u ~/.config/waybar/modules/runcat-text/main.py",
     "return-type": "json",
@@ -49,7 +40,7 @@
     "exec": "~/.config/waybar/scripts/workspaces.sh",
     "return-type": "json",
     "markup": "pango",
-    "interval": 0.5,
+    "interval": 2,
     "on-scroll-up": "~/.config/waybar/scripts/workspace-prev.sh",
     "on-scroll-down": "~/.config/waybar/scripts/workspace-next.sh",
     "on-click": "~/.config/waybar/scripts/workspace-click.sh"
@@ -58,7 +49,7 @@
   "custom/recording": {
     "exec": "~/.config/wallust/recording-indicator.sh",
     "return-type": "json",
-    "interval": 1,
+    "interval": 5,
     "tooltip": false
   },
 
@@ -77,7 +68,7 @@
   },
 
   "network": {
-    "interval": 3,
+    "interval": 10,
     "format": "{icon}",
     "format-icons": ["\uDB82\uDD1F", "\uDB82\uDD22", "\uDB82\uDD25", "\uDB82\uDD28"],
     "format-ethernet": "\uDB80\uDE00",
@@ -135,7 +126,7 @@
     "format": "{}",
     "return-type": "json",
     "exec": "~/.config/waybar/scripts/power-profile.sh",
-    "interval": 5,
+    "interval": 30,
     "on-click": "~/.config/waybar/scripts/power-profile-switch.sh"
   },
 
@@ -151,7 +142,7 @@
   "custom/notification": {
     "exec": "~/.config/waybar/scripts/notification.sh",
     "return-type": "json",
-    "interval": 1,
+    "interval": 5,
     "on-click": "swaync-client -t",
     "on-click-right": "swaync-client -d",
     "tooltip": true

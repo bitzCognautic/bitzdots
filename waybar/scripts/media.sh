@@ -2,6 +2,9 @@
 
 MAX=20
 
+# Kill any previous playerctl --follow instances to avoid accumulation on waybar reload
+pkill -f "playerctl metadata --follow" 2>/dev/null
+
 # Función para procesar y emitir el JSON
 emit() {
     status=$1

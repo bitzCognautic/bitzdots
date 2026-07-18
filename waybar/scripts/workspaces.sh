@@ -3,7 +3,7 @@ CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 [ -f "$CONFIG_DIR/wallust/env" ] && source "$CONFIG_DIR/wallust/env"
 
 active=$(timeout 3 hyprctl activeworkspace -j 2>/dev/null | timeout 3 jq -r '.id')
-clients=$(timeout 3 hyprctl clients -j 2>/dev/null | timeout 3 jq -r '.[].workspace.id' | sort -nu)
+occupied=$(timeout 3 hyprctl workspaces -j 2>/dev/null | timeout 3 jq -r '.[] | select(.windows > 0) | .id')
 
 color_active="#${WALLUST_FG:-FDF9EB}"
 color_occupied="#${WALLUST_COLOR6:-BBB394}"
@@ -25,7 +25,7 @@ for i in $(seq "$start" "$end"); do
     if [ "$i" = "$active" ]; then
         entry="[${i}]"
         item="<span foreground='$color_active' weight='bold'>"
-    elif echo "$clients" | grep -qx "$i"; then
+    elif echo "$occupied" | grep -qx "$i"; then
         entry="|${i}|"
         item="<span foreground='$color_occupied'>"
     else

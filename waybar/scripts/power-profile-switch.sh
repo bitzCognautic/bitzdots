@@ -1,11 +1,9 @@
 #!/bin/bash
-if ! command -v powerprofilesctl &>/dev/null || ! powerprofilesctl get &>/dev/null; then
-    notify-send "Power Profiles" "powerprofilesctl not available"
-    exit 0
-fi
+current=$(busctl get-property org.freedesktop.UPower.PowerProfiles /org/freedesktop/UPower/PowerProfiles org.freedesktop.UPower.PowerProfiles ActiveProfile 2>/dev/null | awk '{print $2}' | tr -d '"')
+[ -z "$current" ] && exit 0
 
-profiles=$(powerprofilesctl list 2>/dev/null | grep -o '^  [a-z-]*' | tr -d ' ')
-current=$(powerprofilesctl get 2>/dev/null)
+profiles=$(busctl get-property org.freedesktop.UPower.PowerProfiles /org/freedesktop/UPower/PowerProfiles org.freedesktop.UPower.PowerProfiles Profiles 2>/dev/null | grep -oP '"Profile" s "\K[^"]+')
+[ -z "$profiles" ] && exit 0
 
 next=""
 found=0
@@ -17,4 +15,4 @@ for p in $profiles; do
 done
 [ -z "$next" ] && next=$(echo "$profiles" | head -1)
 
-powerprofilesctl set "$next" 2>/dev/null && notify-send "Power Profile" "$current → $next" || notify-send -u critical "Power Profile" "Failed to switch"
+busctl set-property org.freedesktop.UPower.PowerProfiles /org/freedesktop/UPower/PowerProfiles org.freedesktop.UPower.PowerProfiles ActiveProfile s "$next" 2>/dev/null && notify-send "Power Profile" "$current → $next" || notify-send -u critical "Power Profile" "Failed to switch"
