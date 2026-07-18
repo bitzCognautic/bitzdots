@@ -2,9 +2,10 @@
 
 LOCKDIR="/tmp/record-fullscreen.lock"
 
+[ -d "$LOCKDIR" ] && ! pgrep -x wf-recorder >/dev/null 2>&1 && rmdir "$LOCKDIR" 2>/dev/null || true
+
 if ! mkdir "$LOCKDIR" 2>/dev/null; then
     pkill -x wf-recorder 2>/dev/null && notify-send "Recording" "Stopped"
-    rmdir "$LOCKDIR" 2>/dev/null || true
     exit 0
 fi
 trap "rmdir '$LOCKDIR' 2>/dev/null || true" EXIT
