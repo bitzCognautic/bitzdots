@@ -66,7 +66,7 @@ hl.bind(SS .. " + S", hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | wl-copy"))
 hl.bind(SS .. " + T", hl.dsp.exec_cmd("~/.local/bin/eink-ocr"))
 
 -- Print screen: full screenshot
-hl.bind("Print", hl.dsp.exec_cmd("grim"))
+hl.bind("Print", hl.dsp.exec_cmd("grim ~/Pictures/Screenshots/"))
 
 -- Color picker
 hl.bind(SC .. " + C", hl.dsp.exec_cmd("hyprpicker -a && wl-copy && notify-send \"Color picked\" \"$(wl-paste)\""))
