@@ -40,7 +40,7 @@
     "exec": "~/.config/waybar/scripts/workspaces.sh",
     "return-type": "json",
     "markup": "pango",
-    "interval": 5,
+    "interval": 3,
     "on-scroll-up": "~/.config/waybar/scripts/workspace-prev.sh",
     "on-scroll-down": "~/.config/waybar/scripts/workspace-next.sh",
     "on-click": "~/.config/waybar/scripts/workspace-click.sh"
@@ -133,7 +133,7 @@
   "custom/brightness": {
     "exec": "~/.config/waybar/scripts/brightness.sh",
     "return-type": "json",
-    "interval": 0,
+    "interval": 5,
     "on-scroll-up": "brightnessctl s +5%",
     "on-scroll-down": "brightnessctl s 5%-",
     "tooltip": true

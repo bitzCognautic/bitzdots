@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-current=$(brightnessctl g 2>/dev/null)
-max=$(brightnessctl m 2>/dev/null)
+current=$(timeout 2 brightnessctl g 2>/dev/null)
+max=$(timeout 2 brightnessctl m 2>/dev/null)
 [ -z "$max" ] && max=255
 
 pct=$(( current * 100 / max ))
