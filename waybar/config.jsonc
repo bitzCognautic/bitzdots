@@ -40,7 +40,7 @@
     "exec": "~/.config/waybar/scripts/workspaces.sh",
     "return-type": "json",
     "markup": "pango",
-    "interval": 3,
+    "interval": 0.5,
     "on-scroll-up": "~/.config/waybar/scripts/workspace-prev.sh",
     "on-scroll-down": "~/.config/waybar/scripts/workspace-next.sh",
     "on-click": "~/.config/waybar/scripts/workspace-click.sh"
@@ -49,7 +49,7 @@
   "custom/recording": {
     "exec": "~/.config/wallust/recording-indicator.sh",
     "return-type": "json",
-    "interval": 10,
+    "interval": 1,
     "tooltip": false
   },
 
@@ -68,7 +68,7 @@
   },
 
   "network": {
-    "interval": 10,
+    "interval": 3,
     "format": "{icon}",
     "format-icons": ["\uDB82\uDD1F", "\uDB82\uDD22", "\uDB82\uDD25", "\uDB82\uDD28"],
     "format-ethernet": "\uDB80\uDE00",
@@ -126,14 +126,14 @@
     "format": "{}",
     "return-type": "json",
     "exec": "~/.config/waybar/scripts/power-profile.sh",
-    "interval": 30,
+    "interval": 5,
     "on-click": "~/.config/waybar/scripts/power-profile-switch.sh"
   },
 
   "custom/brightness": {
     "exec": "~/.config/waybar/scripts/brightness.sh",
     "return-type": "json",
-    "interval": 5,
+    "interval": 0,
     "on-scroll-up": "brightnessctl s +5%",
     "on-scroll-down": "brightnessctl s 5%-",
     "tooltip": true
@@ -142,7 +142,7 @@
   "custom/notification": {
     "exec": "~/.config/waybar/scripts/notification.sh",
     "return-type": "json",
-    "interval": 10,
+    "interval": 1,
     "on-click": "swaync-client -t",
     "on-click-right": "swaync-client -d",
     "tooltip": true
