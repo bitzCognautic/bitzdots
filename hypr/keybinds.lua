@@ -60,13 +60,13 @@ hl.bind(SS .. " + mouse_down", hl.dsp.window.move({ workspace = "-1" }))
 hl.bind(SS .. " + mouse_up",   hl.dsp.window.move({ workspace = "+1" }))
 
 -- Selection screenshot: grim + slurp + save to Freeform/
-hl.bind(SS .. " + S", hl.dsp.exec_cmd("grim -g \"$(slurp)\" ~/Pictures/Screenshots/Freeform/screenshot_$(date +%Y-%m-%d_%H-%M-%S).png && notify-send 'Screenshot' 'Saved to Freeform/' || notify-send -u critical 'Screenshot' 'Canceled'"))
+hl.bind(SS .. " + S", hl.dsp.exec_cmd("f=~/Pictures/Screenshots/Freeform/screenshot_$(date +%Y-%m-%d_%H-%M-%S).png; grim -g \"$(slurp)\" \"$f\" && wl-copy < \"$f\" && notify-send 'Screenshot' 'Saved & Copied' || notify-send -u critical 'Screenshot' 'Canceled'"))
 
 -- OCR screenshot
 hl.bind(SS .. " + T", hl.dsp.exec_cmd("~/.local/bin/eink-ocr"))
 
 -- Print screen: full screenshot
-hl.bind("Print", hl.dsp.exec_cmd("grim ~/Pictures/Screenshots/Fullscreen/screenshot_$(date +%Y-%m-%d_%H-%M-%S).png && notify-send 'Screenshot' 'Saved to Fullscreen/'"))
+hl.bind("Print", hl.dsp.exec_cmd("f=~/Pictures/Screenshots/Fullscreen/screenshot_$(date +%Y-%m-%d_%H-%M-%S).png; grim \"$f\" && wl-copy < \"$f\" && notify-send 'Screenshot' 'Saved & Copied' || notify-send -u critical 'Screenshot' 'Failed'"))
 
 -- Color picker
 hl.bind(SC .. " + C", hl.dsp.exec_cmd("hyprpicker -a && wl-copy && notify-send \"Color picked\" \"$(wl-paste)\""))
