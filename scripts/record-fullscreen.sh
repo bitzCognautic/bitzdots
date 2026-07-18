@@ -1,27 +1,16 @@
 #!/usr/bin/env bash
-set -euo pipefail
 
-PID_FILE="/tmp/wf-recorder-fullscreen.pid"
+LOCKDIR="/tmp/record-fullscreen.lock"
 
-if [ -f "$PID_FILE" ] && kill -0 $(cat "$PID_FILE") 2>/dev/null; then
-    kill $(cat "$PID_FILE") 2>/dev/null || true
-    rm -f "$PID_FILE"
-    notify-send "Recording" "Stopped"
+if ! mkdir "$LOCKDIR" 2>/dev/null; then
+    pkill -x wf-recorder 2>/dev/null && notify-send "Recording" "Stopped"
     exit 0
 fi
+trap "rmdir '$LOCKDIR' 2>/dev/null || true" EXIT
 
-rm -f "$PID_FILE"
 DIR="$HOME/Videos/Recordings/Fullscreen"
 mkdir -p "$DIR"
 FILE="$DIR/recording_$(date +%Y%m%d_%H%M%S).mp4"
 
 notify-send "Recording" "Fullscreen recording started"
-wf-recorder -f "$FILE" -a &
-PID=$!
-echo $PID > "$PID_FILE"
-
-wait $PID || true
-if [ -f "$PID_FILE" ]; then
-    rm -f "$PID_FILE"
-    notify-send "Recording" "Fullscreen recording saved: $FILE"
-fi
+wf-recorder -f "$FILE" < /dev/null && notify-send "Recording" "Fullscreen recording saved: $FILE"

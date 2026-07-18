@@ -1,16 +1,13 @@
 #!/usr/bin/env bash
-set -euo pipefail
 
-PID_FILE="/tmp/wf-recorder-region.pid"
+LOCKDIR="/tmp/record-region.lock"
 
-if [ -f "$PID_FILE" ] && kill -0 $(cat "$PID_FILE") 2>/dev/null; then
-    kill $(cat "$PID_FILE") 2>/dev/null || true
-    rm -f "$PID_FILE"
-    notify-send "Recording" "Stopped"
+if ! mkdir "$LOCKDIR" 2>/dev/null; then
+    pkill -x wf-recorder 2>/dev/null && notify-send "Recording" "Stopped"
     exit 0
 fi
+trap "rmdir '$LOCKDIR' 2>/dev/null || true" EXIT
 
-rm -f "$PID_FILE"
 DIR="$HOME/Videos/Recordings/Region"
 mkdir -p "$DIR"
 GEOM=$(slurp)
@@ -23,12 +20,4 @@ fi
 FILE="$DIR/recording_$(date +%Y%m%d_%H%M%S).mp4"
 
 notify-send "Recording" "Region recording started"
-wf-recorder -g "$GEOM" -f "$FILE" -a &
-PID=$!
-echo $PID > "$PID_FILE"
-
-wait $PID || true
-if [ -f "$PID_FILE" ]; then
-    rm -f "$PID_FILE"
-    notify-send "Recording" "Region recording saved: $FILE"
-fi
+wf-recorder -g "$GEOM" -f "$FILE" < /dev/null && notify-send "Recording" "Region recording saved: $FILE"
