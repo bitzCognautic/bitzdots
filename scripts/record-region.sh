@@ -20,5 +20,4 @@ fi
 FILE="$DIR/recording_$(date +%Y%m%d_%H%M%S).mp4"
 
 notify-send "Recording" "Region recording started"
-wf-recorder -g "$GEOM" -f "$FILE" -a
-notify-send "Recording" "Region recording saved: $FILE"
+wf-recorder -g "$GEOM" -f "$FILE" -a && notify-send "Recording" "Region recording saved: $FILE"
