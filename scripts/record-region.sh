@@ -1,21 +1,10 @@
 #!/usr/bin/env bash
 
 DEBOUNCE_DIR="/tmp/record-region.debounce"
-PID_FILE="/tmp/wf-recorder-region.pid"
-
 if ! mkdir "$DEBOUNCE_DIR" 2>/dev/null; then exit 0; fi
 trap "rmdir '$DEBOUNCE_DIR' 2>/dev/null || true" EXIT
 
-[ -f "$PID_FILE" ] && ! kill -0 $(cat "$PID_FILE") 2>/dev/null && rm -f "$PID_FILE"
-
-if [ -f "$PID_FILE" ] && kill -0 $(cat "$PID_FILE") 2>/dev/null; then
-    pgrep -x wf-recorder >/dev/null 2>&1 && pkill -x wf-recorder 2>/dev/null && notify-send "Recording" "Stopped"
-    exit 0
-fi
-
-rm -f "$PID_FILE"
-echo $$ > "$PID_FILE"
-trap "rm -f '$PID_FILE'; rmdir '$DEBOUNCE_DIR' 2>/dev/null || true" EXIT
+pgrep -x wf-recorder >/dev/null 2>&1 && exit 0
 
 DIR="$HOME/Videos/Recordings/Region"
 mkdir -p "$DIR"

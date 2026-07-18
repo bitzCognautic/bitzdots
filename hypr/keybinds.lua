@@ -94,6 +94,7 @@ hl.bind(S  .. " + C",     hl.dsp.exec_cmd("code"))
 -- Wallpaper selector
 hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("~/.config/wallust/wallpaper-select.sh"))
 
--- Screen recording
+-- Screen recording: SUPER+R / SUPER+SHIFT+R to start, SUPER+S to stop any
 hl.bind(S  .. " + R",  hl.dsp.exec_cmd("~/.config/wallust/record-fullscreen.sh"))
 hl.bind(SS .. " + R",  hl.dsp.exec_cmd("~/.config/wallust/record-region.sh"))
+hl.bind(S  .. " + S",  hl.dsp.exec_cmd("pkill -x wf-recorder 2>/dev/null && notify-send 'Recording' 'Stopped'"))
