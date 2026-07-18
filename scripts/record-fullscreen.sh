@@ -13,4 +13,6 @@ mkdir -p "$DIR"
 FILE="$DIR/recording_$(date +%Y%m%d_%H%M%S).mp4"
 
 notify-send "Recording" "Fullscreen recording started"
-wf-recorder -f "$FILE" < /dev/null && notify-send "Recording" "Fullscreen recording saved: $FILE"
+AUDIO="$(pactl get-default-sink 2>/dev/null).monitor"
+wf-recorder -f "$FILE" -a "$AUDIO" -c libx264 -p crf=18 -C libopus < /dev/null \
+    && notify-send "Recording" "Fullscreen recording saved: $FILE"

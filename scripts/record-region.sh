@@ -20,4 +20,6 @@ fi
 FILE="$DIR/recording_$(date +%Y%m%d_%H%M%S).mp4"
 
 notify-send "Recording" "Region recording started"
-wf-recorder -g "$GEOM" -f "$FILE" < /dev/null && notify-send "Recording" "Region recording saved: $FILE"
+AUDIO="$(pactl get-default-sink 2>/dev/null).monitor"
+wf-recorder -g "$GEOM" -f "$FILE" -a "$AUDIO" -c libx264 -p crf=18 -C libopus < /dev/null \
+    && notify-send "Recording" "Region recording saved: $FILE"
