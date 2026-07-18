@@ -1,11 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-LOCK_FILE="/tmp/record-region.lock"
 PID_FILE="/tmp/wf-recorder-region.pid"
-
-exec 200>"$LOCK_FILE"
-flock 200
 
 if [ -f "$PID_FILE" ] && kill -0 $(cat "$PID_FILE") 2>/dev/null; then
     kill $(cat "$PID_FILE") 2>/dev/null || true
@@ -30,8 +26,6 @@ notify-send "Recording" "Region recording started"
 wf-recorder -g "$GEOM" -f "$FILE" -a &
 PID=$!
 echo $PID > "$PID_FILE"
-
-flock -u 200
 
 wait $PID || true
 if [ -f "$PID_FILE" ]; then
