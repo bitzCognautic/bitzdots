@@ -94,6 +94,15 @@ hl.bind(S  .. " + C",     hl.dsp.exec_cmd("code"))
 -- Wallpaper selector
 hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("~/.config/wallust/wallpaper-select.sh"))
 
--- Screen recording
-hl.bind(S  .. " + R",  hl.dsp.exec_cmd("~/.config/wallust/record-fullscreen.sh"))
-hl.bind(SS .. " + R",  hl.dsp.exec_cmd("~/.config/wallust/record-region.sh"))
+-- Screen recording (debounced — Hyprland fires keybinds twice on single press)
+local last_rec = 0
+local function toggle_rec(cmd)
+    return function()
+        local now = os.time()
+        if now - last_rec < 1 then return end
+        last_rec = now
+        return hl.dsp.exec_cmd(cmd)
+    end
+end
+hl.bind(S  .. " + R",  toggle_rec("~/.config/wallust/record-fullscreen.sh"))
+hl.bind(SS .. " + R",  toggle_rec("~/.config/wallust/record-region.sh"))
