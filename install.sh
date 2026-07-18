@@ -492,7 +492,7 @@ fi
 
 setup_wallpapers
 setup_cache
-mkdir -p "$HOME/Pictures/Screenshots" 2>/dev/null || true
+mkdir -p "$HOME/Pictures/Screenshots/Fullscreen" "$HOME/Pictures/Screenshots/Freeform" 2>/dev/null || true
 install_nerd_font
 install_scripts
 link_dotfiles
