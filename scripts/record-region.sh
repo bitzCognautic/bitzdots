@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-DEBOUNCE_FILE="/tmp/record-region.debounce"
-NOW=$(date +%s%N)
-[ -f "$DEBOUNCE_FILE" ] && LAST=$(cat "$DEBOUNCE_FILE" 2>/dev/null) && [ $((NOW - LAST)) -lt 200000000 ] 2>/dev/null && exit 0
-echo "$NOW" > "$DEBOUNCE_FILE"
+DEBOUNCE_DIR="/tmp/record-region.debounce"
+if ! mkdir "$DEBOUNCE_DIR" 2>/dev/null; then exit 0; fi
+(sleep 0.2 && rmdir "$DEBOUNCE_DIR" 2>/dev/null || true) &
 
 PID_FILE="/tmp/wf-recorder-region.pid"
 

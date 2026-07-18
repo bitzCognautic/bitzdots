@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 
-DEBOUNCE_FILE="/tmp/record-fullscreen.debounce"
-NOW=$(date +%s%N)
-[ -f "$DEBOUNCE_FILE" ] && LAST=$(cat "$DEBOUNCE_FILE" 2>/dev/null) && [ $((NOW - LAST)) -lt 200000000 ] 2>/dev/null && exit 0
-echo "$NOW" > "$DEBOUNCE_FILE"
+DEBOUNCE_DIR="/tmp/record-fullscreen.debounce"
+if ! mkdir "$DEBOUNCE_DIR" 2>/dev/null; then exit 0; fi
+(sleep 0.2 && rmdir "$DEBOUNCE_DIR" 2>/dev/null || true) &
 
 PID_FILE="/tmp/wf-recorder-fullscreen.pid"
 
-# Clean stale PID from previous crash
 [ -f "$PID_FILE" ] && ! kill -0 $(cat "$PID_FILE") 2>/dev/null && rm -f "$PID_FILE"
 
 if [ -f "$PID_FILE" ] && kill -0 $(cat "$PID_FILE") 2>/dev/null; then
