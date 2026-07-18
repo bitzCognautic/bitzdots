@@ -2,8 +2,8 @@
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 [ -f "$CONFIG_DIR/wallust/env" ] && source "$CONFIG_DIR/wallust/env"
 
-active=$(timeout 3 hyprctl activeworkspace -j 2>/dev/null | timeout 3 jq -r '.id')
-occupied=$(timeout 3 hyprctl workspaces -j 2>/dev/null | timeout 3 jq -r '.[] | select(.windows > 0) | .id')
+active=$(timeout 3 hyprctl activeworkspace -j 2>/dev/null | jq -r '.id' 2>/dev/null)
+occupied=$(timeout 3 hyprctl workspaces -j 2>/dev/null | jq -r '.[] | select(.windows > 0) | .id')
 
 color_active="#${WALLUST_FG:-FDF9EB}"
 color_occupied="#${WALLUST_COLOR6:-BBB394}"
