@@ -16,7 +16,7 @@ pactl set-source-volume "$AUDIO" 200% 2>/dev/null || true
 trap "pactl set-source-volume '$AUDIO' '$OLD_VOL' 2>/dev/null || true; rmdir '$DEBOUNCE_DIR' 2>/dev/null || true" EXIT
 
 notify-send "Recording" "Fullscreen recording started"
-if wf-recorder -f "$FILE" -a "$AUDIO"; then
+if wf-recorder -f "$FILE" --audio="$AUDIO"; then
     ffmpeg -i "$FILE" -af "volume=3.0" -c:v copy -c:a aac -b:a 192k "${FILE}.tmp" 2>/dev/null && mv "${FILE}.tmp" "$FILE"
     notify-send "Recording" "Fullscreen recording saved: $FILE"
 fi
