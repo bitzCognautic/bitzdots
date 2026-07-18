@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+DEBOUNCE_FILE="/tmp/record-region.debounce"
+NOW=$(date +%s%N)
+[ -f "$DEBOUNCE_FILE" ] && LAST=$(cat "$DEBOUNCE_FILE" 2>/dev/null) && [ $((NOW - LAST)) -lt 200000000 ] 2>/dev/null && exit 0
+echo "$NOW" > "$DEBOUNCE_FILE"
+
 PID_FILE="/tmp/wf-recorder-region.pid"
 
 [ -f "$PID_FILE" ] && ! kill -0 $(cat "$PID_FILE") 2>/dev/null && rm -f "$PID_FILE"
