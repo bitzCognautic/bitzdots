@@ -2,6 +2,14 @@
 
 Hyprland dotfiles with automatic wallust color theming. Every component — waybar, rofi, kitty, swaync, wlogout, cava, even Qt/KDE apps — picks up colors from your wallpaper automatically.
 
+## Screenshots
+
+Two different wallpaper themes showing automatic color generation across all UI elements.
+
+![Theme 1](ss/ss1.png)
+
+![Theme 2](ss/ss2.png)
+
 ## Requirements
 
 - **Hyprland** (Wayland compositor)
