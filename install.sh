@@ -50,7 +50,7 @@ install_deps() {
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
                 impala bluetui btop pulsemixer wf-recorder python \
-                power-profiles-daemon breeze inotify-tools 2>&1 | \
+                power-profiles-daemon breeze inotify-tools fish fastfetch 2>&1 | \
                 grep -o "target not found: [^']*" | cut -d' ' -f4 > /tmp/missing_pkgs.txt || true
 
 
@@ -294,6 +294,8 @@ link_dotfiles() {
     mkdir -p "$CONFIG_DIR/gtk-3.0"
     mkdir -p "$CONFIG_DIR/gtk-4.0"
     mkdir -p "$CONFIG_DIR/environment.d"
+    mkdir -p "$CONFIG_DIR/fish"
+    mkdir -p "$CONFIG_DIR/fastfetch"
     # Waybar
     link_config "$DOTFILES_DIR/waybar/config.jsonc" "$CONFIG_DIR/waybar/config.jsonc" "waybar"
     link_config "$DOTFILES_DIR/waybar/style.css" "$CONFIG_DIR/waybar/style.css" "waybar"
@@ -356,6 +358,13 @@ link_dotfiles() {
 
     # Qt environment
     link_config "$DOTFILES_DIR/environment.d/qt.conf" "$CONFIG_DIR/environment.d/qt.conf" "qt"
+
+    # Fish
+    link_config "$DOTFILES_DIR/fish/config.fish" "$CONFIG_DIR/fish/config.fish" "fish"
+
+    # Fastfetch
+    link_config "$DOTFILES_DIR/fastfetch/config.jsonc" "$CONFIG_DIR/fastfetch/config.jsonc" "fastfetch"
+    link_config "$DOTFILES_DIR/fastfetch/bitz.txt" "$CONFIG_DIR/fastfetch/bitz.txt" "fastfetch"
 }
 
 # ── Fix hardcoded paths ─────────────────────────────────────────
@@ -429,6 +438,24 @@ generate_initial_theme() {
     ok "Initial theme generated from $(basename "$initial_wall")"
 }
 
+# ── Set fish as default shell if installed ─────────────────────
+set_default_shell() {
+    if command -v fish &>/dev/null; then
+        local fish_path
+        fish_path=$(command -v fish)
+        if [ "$SHELL" != "$fish_path" ]; then
+            if chsh -s "$fish_path" 2>/dev/null; then
+                ok "Default shell set to fish ($fish_path)"
+            else
+                warn "Could not set fish as default shell (chsh failed)"
+                echo "  Run manually: chsh -s $fish_path"
+            fi
+        else
+            ok "Fish is already the default shell"
+        fi
+    fi
+}
+
 # ═══════════════════════════════════════════════════════════════
 # MAIN
 # ═══════════════════════════════════════════════════════════════
@@ -472,6 +499,7 @@ make_executable
 setup_runcat
 fix_paths
 add_keybind
+set_default_shell
 generate_initial_theme
 
 # Install systemd user service for cache daemon
