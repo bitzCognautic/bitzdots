@@ -285,6 +285,7 @@ link_dotfiles() {
     mkdir -p "$CONFIG_DIR/cava/shaders"
     mkdir -p "$CONFIG_DIR/wlogout/assets"
     mkdir -p "$CONFIG_DIR/wlogout/icons"
+    mkdir -p "$CONFIG_DIR/wlogout/actions"
     mkdir -p "$CONFIG_DIR/swaync"
     mkdir -p "$CONFIG_DIR/rofi/themes"
     mkdir -p "$CONFIG_DIR/rofi/colors"
@@ -330,6 +331,9 @@ link_dotfiles() {
     done
     for f in "$DOTFILES_DIR/wlogout/icons"/*; do
         link_config "$f" "$CONFIG_DIR/wlogout/icons/$(basename "$f")" "wlogout"
+    done
+    for f in "$DOTFILES_DIR/wlogout/actions"/*; do
+        link_config "$f" "$CONFIG_DIR/wlogout/actions/$(basename "$f")" "wlogout"
     done
 
     # Rofi
