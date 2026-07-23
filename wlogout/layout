@@ -8,7 +8,7 @@
         },
         {
             "label": "logout",
-            "action": "~/.config/wlogout/actions/logout.sh",
+            "action": "hyprlogout",
             "text": "Logout",
             "keybind": "e"
         },

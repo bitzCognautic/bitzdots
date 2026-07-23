@@ -14,7 +14,7 @@ choice=$(
 
 case "$choice" in
     "Lock")     hyprlock ;;
-    "Logout")   hyprctl dispatch exit ;;
+    "Logout")   hyprlogout ;;
     "Sleep")    systemctl suspend ;;
     "Reboot")   systemctl reboot ;;
     "Shutdown") systemctl poweroff ;;

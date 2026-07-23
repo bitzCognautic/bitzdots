@@ -266,6 +266,7 @@ make_executable() {
         chmod +x "$s" 2>/dev/null || true
     done
     chmod +x "$CONFIG_DIR/rofi/scripts/script_wallpaper.sh" 2>/dev/null || true
+    chmod +x "$HOME/.local/bin/hyprlogout" 2>/dev/null || true
     ok "Scripts made executable"
 }
 
