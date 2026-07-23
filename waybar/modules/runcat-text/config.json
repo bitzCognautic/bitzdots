@@ -2,8 +2,8 @@
     "icons": "\ue900\ue901\ue902\ue903\ue904",
     "return-type": "json",
     "ui": {
-        "fps_l": 6,
-        "fps_h": 15
+        "fps_l": 1,
+        "fps_h": 3
     },
     "cpu": {
         "interval": 1,
