@@ -85,7 +85,7 @@
     "format": "{icon}",
     "format-off": "\uDB80\uDCB2",
     "format-disabled": "\uDB80\uDCB2",
-    "format-connected": "\uDB80\uDCB2",
+    "format-connected": "\uDB80\uDCB1",
     "format-no-controller": "",
     "format-icons": ["\uDB80\uDCAF", "\uDB80\uDCB1", "\uDB80\uDCB2"],
     "tooltip-format": "Devices connected: {num_connections}",
