@@ -1,7 +1,6 @@
 #!/bin/bash
-data=$(hyprctl workspaces -j 2>/dev/null)
-active=$(echo "$data" | jq -r '.[] | select(.focused == true) | .id' 2>/dev/null)
-occupied=$(echo "$data" | jq -r '.[] | select(.windows > 0) | .id' 2>/dev/null | tr '\n' ' ')
+active=$(hyprctl activeworkspace -j 2>/dev/null | jq -r '.id' 2>/dev/null)
+occupied=$(hyprctl workspaces -j 2>/dev/null | jq -r '.[] | select(.windows > 0) | .id' 2>/dev/null | tr '\n' ' ')
 [ -z "$active" ] && active=1
 
 start=$(( (active - 1) / 5 * 5 + 1 ))
