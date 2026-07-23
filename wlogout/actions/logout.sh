@@ -1,2 +1,2 @@
 #!/bin/bash
-hyprctl dispatch 'hl.dsp.exit()'
+pkill -x Hyprland
