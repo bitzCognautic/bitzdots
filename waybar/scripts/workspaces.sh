@@ -1,9 +1,9 @@
 #!/bin/bash
-eval "$(hyprctl workspaces -j 2>/dev/null | jq -r '
-  .[] | select(.focused == true) | .id as $a |
-  [.[] | select(.windows > 0) | .id] as $o |
-  "active=\($a)\noccupied=\($o | join(" "))"
-' 2>/dev/null)"
+data=$(hyprctl workspaces -j 2>/dev/null)
+active=$(echo "$data" | jq -r '.[] | select(.focused == true) | .id' 2>/dev/null)
+occupied=$(echo "$data" | jq -r '.[] | select(.windows > 0) | .id' 2>/dev/null | tr '\n' ' ')
+
+[ -z "$active" ] && active=1
 
 color_active="#${WALLUST_FG:-FDF9EB}"
 color_occupied="#${WALLUST_COLOR6:-BBB394}"
@@ -19,8 +19,8 @@ for (( i = start; i <= end; i++ )); do
     elif [[ " $occupied " == *" $i "* ]]; then
         text+="<span foreground='$color_occupied'> |${i}| </span>"
     else
-        text+="<span foreground='$color_empty'>  ${i}  </span>"
+        text+="  ${i}  "
     fi
 done
 
-jq -cn --arg text "$text" --arg alt "$active" '{text: $text, class: "workspaces", alt: $alt}'
+printf '{"text":"%s","class":"workspaces","alt":"%s"}\n' "$text" "$active"
