@@ -1,8 +1,12 @@
 #!/bin/bash
 # Rofi clipboard manager using cliphist
+# Usage: clipboard.sh           — copy mode
+#        clipboard.sh --delete  — delete mode (SUPER+SHIFT+V)
 
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 ROFI_THEME="$CONFIG_DIR/rofi/themes/launcher.rasi"
+DELETE_MODE=false
+[ "${1:-}" = "--delete" ] && DELETE_MODE=true
 
 if ! command -v cliphist &>/dev/null; then
     notify-send -u critical "cliphist not installed"
@@ -24,8 +28,18 @@ if [ -z "$entries" ]; then
     exit 0
 fi
 
+if $DELETE_MODE; then
+    PROMPT="Delete"
+    KB_ENTER="Delete selection"
+    KB_CUSTOM="Cancel"
+else
+    PROMPT="Copy"
+    KB_ENTER="Copy selection"
+    KB_CUSTOM="Cancel"
+fi
+
 selected=$(
-    echo "$entries" | rofi -dmenu -i -p "" -theme "$ROFI_THEME" \
+    echo "$entries" | rofi -dmenu -i -p "$PROMPT" -theme "$ROFI_THEME" \
         -theme-str 'listview { columns: 1; lines: 10; } entry { placeholder: ""; }'
 )
 
@@ -39,5 +53,10 @@ if [ -z "$item_id" ]; then
     exit 0
 fi
 
-cliphist decode "$item_id" | wl-copy
-notify-send "Clipboard" "Item #$item_id copied"
+if $DELETE_MODE; then
+    echo "$item_id" | cliphist delete
+    notify-send "Clipboard" "Item #$item_id deleted"
+else
+    cliphist decode "$item_id" | wl-copy
+    notify-send "Clipboard" "Item #$item_id copied"
+fi

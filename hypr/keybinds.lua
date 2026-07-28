@@ -82,6 +82,7 @@ hl.bind(S .. " + P", hl.dsp.exec_cmd("~/.config/rofi/scripts/system-power.sh"))
 
 -- Clipboard history
 hl.bind(S  .. " + V", hl.dsp.exec_cmd("~/.config/rofi/scripts/clipboard.sh"))
+hl.bind(SS .. " + V", hl.dsp.exec_cmd("~/.config/rofi/scripts/clipboard.sh --delete"))
 hl.bind(SA .. " + V", hl.dsp.exec_cmd("cliphist wipe"))
 
 -- Additional useful binds
