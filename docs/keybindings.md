@@ -60,7 +60,8 @@ All keyboard shortcuts for bitzdots. Modifiers:
 | `SUPER + L` | Lock screen (hyprlock) |
 | `SUPER + P` | Power menu (rofi) |
 | `SUPER + N` | Toggle notification panel |
-| `SUPER + V` | Clipboard history (rofi + cliphist) |
+| `SUPER + V` | Clipboard history — pick to copy (rofi + cliphist) |
+| `SUPER + SHIFT + V` | Clipboard history — pick to delete |
 | `SUPER + ALT + V` | Wipe clipboard history |
 | `SUPER + CTRL + C` | Color picker (hyprpicker + copy) |
 | `SUPER + SHIFT + W` | Wallpaper picker |

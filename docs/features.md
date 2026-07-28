@@ -58,7 +58,7 @@ Top-mounted, 26px height status bar with 10+ custom modules:
 Every system function has a keyboard-navigable rofi interface:
 
 - **App Launcher** — `SUPER + Space`
-- **Clipboard History** — `SUPER + V` (cliphist integration)
+- **Clipboard History** — `SUPER + V` to copy, `SUPER + SHIFT + V` to delete (cliphist integration)
 - **Power Menu** — `SUPER + P` (lock, logout, sleep, reboot, shutdown)
 - **Wallpaper Picker** — `SUPER + SHIFT + W` (static + live, grid with thumbnails)
 - **Audio Menu** — Switch output/input devices, open pulsemixer

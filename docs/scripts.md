@@ -144,11 +144,13 @@ Generates a basic `hyprlock.conf` from current wallpaper.
 Clipboard history manager.
 
 ```bash
-~/.config/rofi/scripts/clipboard.sh
+~/.config/rofi/scripts/clipboard.sh              # copy mode
+~/.config/rofi/scripts/clipboard.sh --delete      # delete mode
 ```
 
 - Lists recent clipboard entries from cliphist
-- Decodes and copies selected entry back to clipboard
+- Default mode (`SUPER+V`): decodes and copies selected entry back to clipboard
+- Delete mode (`SUPER+SHIFT+V`): removes selected entry from clipboard history
 - Starts cliphist store daemon if not running
 - Keyboard navigable via rofi
 
