@@ -257,7 +257,7 @@ install_waybar_config() {
     link_config "$DOTFILES_DIR/waybar/scripts/launch.sh" "$CONFIG_DIR/waybar/scripts/launch.sh" "waybar"
     link_config "$DOTFILES_DIR/waybar/scripts/media.sh" "$CONFIG_DIR/waybar/scripts/media.sh" "waybar"
     link_config "$DOTFILES_DIR/waybar/scripts/weather.sh" "$CONFIG_DIR/waybar/scripts/weather.sh" "waybar"
-    for s in brightness.sh notification.sh system-wifi.sh system-bluetooth.sh system-audio.sh system-cpu.sh system-memory.sh power-profile.sh power-profile-switch.sh system-power.sh workspaces.sh workspace-click.sh workspace-next.sh workspace-prev.sh tui-wifi.sh tui-bluetooth.sh tui-audio.sh tui-cpu.sh; do
+    for s in brightness.sh brightness-adjust.sh notification.sh system-wifi.sh system-bluetooth.sh system-audio.sh system-cpu.sh system-memory.sh power-profile.sh power-profile-switch.sh system-power.sh workspaces.sh workspace-click.sh workspace-next.sh workspace-prev.sh tui-wifi.sh tui-bluetooth.sh tui-audio.sh tui-cpu.sh; do
         link_config "$DOTFILES_DIR/waybar/scripts/$s" "$CONFIG_DIR/waybar/scripts/$s" "waybar"
     done
     for s in "$DOTFILES_DIR/scripts"/record*.sh; do
@@ -379,6 +379,7 @@ generate_initial_theme() {
     command -v wallust &>/dev/null || { warn "wallust not installed — skipping theme generation"; return; }
 
     local initial_wall=""
+    local img
     for img in $(find "$WALL_DIR" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | sort); do
         if wallust run "$img" --config-dir "$CONFIG_DIR/wallust" -q 2>/dev/null; then
             initial_wall="$img"
@@ -397,7 +398,22 @@ generate_initial_theme() {
         awww img "$initial_wall" --transition-type grow --transition-duration 1 2>/dev/null || true
     fi
 
-    ok "Theme generated from $(basename "$initial_wall")"
+    # Verify key outputs exist
+    local key_outputs=("$CONFIG_DIR/waybar/style.css" "$CONFIG_DIR/hypr/colors.lua" "$CONFIG_DIR/swaync/style.css")
+    local all_exist=true
+    for f in "${key_outputs[@]}"; do
+        if [ ! -f "$f" ]; then
+            warn "  Missing: $f"
+            all_exist=false
+        fi
+    done
+
+    if [ "$all_exist" = true ]; then
+        ok "Theme generated from $(basename "$initial_wall")"
+    else
+        warn "Theme generation had issues - some output files missing"
+        warn "Run manually: wallust run \"$initial_wall\" --config-dir \"$CONFIG_DIR/wallust\""
+    fi
 }
 
 install_systemd_services() {
@@ -413,6 +429,137 @@ install_systemd_services() {
         sudo rfkill unblock bluetooth 2>/dev/null || true
         sudo systemctl enable --now bluetooth.service 2>/dev/null || true
         ok "Bluetooth service enabled"
+    fi
+}
+
+install_cargo_tools() {
+    command -v cargo &>/dev/null || return 0
+    local installed=false
+
+    if ! command -v bluetui &>/dev/null; then
+        log "Installing bluetui via cargo..."
+        cargo install bluetui 2>/dev/null && { ok "  bluetui installed"; installed=true; } || warn "  bluetui install failed"
+    fi
+
+    if ! command -v impala &>/dev/null; then
+        log "Installing impala via cargo..."
+        cargo install impala 2>/dev/null && { ok "  impala installed"; installed=true; } || warn "  impala install failed"
+    fi
+
+    if ! command -v wallust &>/dev/null; then
+        log "Installing wallust via cargo..."
+        cargo install wallust 2>/dev/null && { ok "  wallust installed"; installed=true; } || warn "  wallust install failed"
+    fi
+}
+
+verify_critical_tools() {
+    log "Verifying critical tools..."
+    local missing=()
+    local tools=(
+        "brightnessctl:brightnessctl:for display backlight control"
+        "wallust:wallust:for theme generation from wallpapers"
+        "swaync:swaync:notification daemon"
+        "notify-send:libnotify:for desktop notifications"
+        "bluetoothctl:bluez-utils:Bluetooth control"
+        "playerctl:playerctl:media player control"
+        "rofi:rofi:application launcher and menus"
+        "waybar:waybar:status bar"
+        "kitty:kitty:terminal emulator"
+    )
+
+    for entry in "${tools[@]}"; do
+        local bin="${entry%%:*}"
+        local pkg="${entry#*:}"; pkg="${pkg%%:*}"
+        local desc="${entry##*:}"
+        if ! command -v "$bin" &>/dev/null; then
+            missing+=("$pkg ($desc)")
+        fi
+    done
+
+    if command -v bluetui &>/dev/null; then
+        ok "  bluetui found - Bluetooth TUI available"
+    else
+        warn "  bluetui not found - tui-bluetooth.sh will fall back to bluetoothctl"
+        warn "    Install: paru -S bluetui (Arch) or cargo install bluetui"
+    fi
+
+    if command -v impala &>/dev/null; then
+        ok "  impala found - WiFi TUI available"
+    else
+        warn "  impala not found - tui-wifi.sh will fall back to nmtui"
+        warn "    Install: paru -S impala (Arch) or cargo install impala"
+    fi
+
+    if [ ${#missing[@]} -gt 0 ]; then
+        warn "Missing critical tools:"
+        for m in "${missing[@]}"; do
+            warn "  - $m"
+        done
+        warn "Install missing packages manually for full functionality."
+    else
+        ok "All critical tools present"
+    fi
+}
+
+verify_swaync_running() {
+    log "Verifying notification daemon..."
+
+    if pgrep -x swaync > /dev/null 2>&1; then
+        ok "swaync is running"
+    else
+        warn "swaync is not running. Attempting to start..."
+        swaync &>/dev/null &
+        sleep 1
+        if pgrep -x swaync > /dev/null 2>&1; then
+            ok "swaync started successfully"
+        else
+            warn "Could not start swaync. Notifications will not work."
+            warn "After logging into Hyprland, run: swaync &"
+            warn "Or add 'swaync' to your Hyprland autostart."
+        fi
+    fi
+
+    local dbus_running=false
+    if command -v busctl &>/dev/null; then
+        if busctl list 2>/dev/null | grep -q "org.freedesktop.Notifications"; then
+            dbus_running=true
+        fi
+    elif command -v dbus-send &>/dev/null; then
+        if dbus-send --session --dest=org.freedesktop.DBus --type=method_call --print-reply \
+            /org/freedesktop/DBus org.freedesktop.DBus.ListNames 2>/dev/null | \
+            grep -q "org.freedesktop.Notifications"; then
+            dbus_running=true
+        fi
+    fi
+
+    if [ "$dbus_running" = true ]; then
+        ok "Notification D-Bus service is registered"
+    else
+        warn "No notification daemon registered on D-Bus"
+        warn "After swaync starts, run: notify-send test"
+    fi
+}
+
+verify_theme_outputs() {
+    log "Verifying theme output files..."
+    local outputs=(
+        "waybar/style.css"
+        "waybar/config.jsonc"
+        "swaync/style.css"
+        "hypr/colors.lua"
+    )
+    local all_ok=true
+    for f in "${outputs[@]}"; do
+        if [ -f "$CONFIG_DIR/$f" ]; then
+            ok "  $f exists"
+        else
+            warn "  $f missing - theme may not be applied"
+            all_ok=false
+        fi
+    done
+
+    if [ "$all_ok" = false ]; then
+        warn "Some theme files are missing. Run: wallust run ~/Pictures/Wallpapers/<image> --config-dir $CONFIG_DIR/wallust"
     fi
 }
 
@@ -451,6 +598,11 @@ fix_paths
 add_keybind
 generate_initial_theme
 install_systemd_services
+
+install_cargo_tools
+verify_critical_tools
+verify_swaync_running
+verify_theme_outputs
 
 echo ""
 echo -e "${GREEN}╔══════════════════════════════════╗${NC}"

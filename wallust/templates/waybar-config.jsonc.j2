@@ -135,8 +135,8 @@
     "exec": "~/.config/waybar/scripts/brightness.sh",
     "return-type": "json",
     "interval": 5,
-    "on-scroll-up": "brightnessctl s +5%",
-    "on-scroll-down": "brightnessctl s 5%-",
+    "on-scroll-up": "~/.config/waybar/scripts/brightness-adjust.sh up",
+    "on-scroll-down": "~/.config/waybar/scripts/brightness-adjust.sh down",
     "tooltip": true
   },
 

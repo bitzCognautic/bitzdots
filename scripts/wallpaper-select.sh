@@ -9,11 +9,22 @@ ROFI_THEME="$CONFIG_DIR/rofi/themes/wallpaper-grid.rasi"
 ROFI_POWER="$CONFIG_DIR/rofi/themes/power.rasi"
 LIVE_DIR="$WALL_DIR/live"
 THUMB_DIR="$CACHE_DIR/wallust-thumbs"
+LOG_DIR="$CACHE_DIR/wallust"
+LOG_FILE="$LOG_DIR/wallpaper-select.log"
 
-mkdir -p "$CACHE_DIR" "$THUMB_DIR" "$THEME_CACHE"
+mkdir -p "$CACHE_DIR" "$THUMB_DIR" "$THEME_CACHE" "$LOG_DIR"
+
+alert() {
+    local urgency="${2:-normal}"
+    local title="$1"
+    local msg="$3"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$urgency] $title${msg:+ - $msg}" >> "$LOG_FILE"
+    echo "[wallpaper-select] $title${msg:+ - $msg}" >&2
+    notify-send -u "$urgency" "$title" "$msg" 2>/dev/null || true
+}
 
 if [ ! -d "$WALL_DIR" ]; then
-    notify-send -u critical "Wallpapers not found" "Directory $WALL_DIR does not exist"
+    alert "Wallpapers not found" critical "Directory $WALL_DIR does not exist"
     exit 1
 fi
 
@@ -135,7 +146,7 @@ set_static() {
     name="$(basename "$img" | sed 's/\.[^.]*$//')"
 
     if ! command -v wallust &>/dev/null; then
-        notify-send -u critical "wallust not installed"
+        alert "wallust not installed" critical
         exit 1
     fi
 
@@ -158,21 +169,21 @@ set_static() {
     fi
 
     if ! apply_cached_theme "$name"; then
-        notify-send -i "$img" "Generating theme..." "Calculating color palette..."
+        alert "Generating theme..." normal "Calculating color palette..."
         backup_theme
         if timeout 30 wallust run "$img" --config-dir "$CONFIG_DIR/wallust"; then
             cache_current_theme "$name" || true
             clear_backup
         else
             restore_theme
-            notify-send -u critical "Theme generation failed" "Could not generate colors for this wallpaper"
+            alert "Theme generation failed" critical "Could not generate colors for this wallpaper"
             return 1
         fi
     fi
 
     "$CONFIG_DIR/wallust/reload-theme.sh" || true
 
-    notify-send -i "$img" "Theme updated" "Wallpaper and colors applied"
+    alert "Theme updated" normal "Wallpaper and colors applied"
 
     # Restart waybar to pick up new config.jsonc and CSS
     if pgrep -x waybar > /dev/null; then
@@ -189,7 +200,7 @@ set_live() {
     name="$(basename "$video" | sed 's/\.[^.]*$//')"
 
     if ! command -v mpvpaper &>/dev/null; then
-        notify-send -u critical "mpvpaper not installed" "Install mpvpaper for live wallpapers"
+        alert "mpvpaper not installed" critical "Install mpvpaper for live wallpapers"
         exit 1
     fi
 
@@ -204,20 +215,20 @@ set_live() {
         if [ -f "$frame" ]; then
             ln -sf "$frame" "$CACHE_DIR/current_wallpaper.png" 2>/dev/null || true
             if ! apply_cached_theme "$name"; then
-                notify-send -i video "Generating theme..." "Calculating color palette..."
+                alert "Generating theme..." normal "Calculating color palette..."
                 backup_theme
                 if timeout 30 wallust run "$frame" --config-dir "$CONFIG_DIR/wallust"; then
                     cache_current_theme "$name" || true
                     clear_backup
                 else
                     restore_theme
-                    notify-send -u critical "Theme generation failed" "Could not generate colors for this wallpaper"
+                    alert "Theme generation failed" critical "Could not generate colors for this wallpaper"
                     return 1
                 fi
             fi
             "$CONFIG_DIR/wallust/reload-theme.sh" || true
 
-            notify-send -i video "Live wallpaper" "$(basename "$video")"
+            alert "Live wallpaper" normal "$(basename "$video")"
 
             # Restart waybar to pick up new config.jsonc and CSS
             if pgrep -x waybar > /dev/null; then
@@ -254,7 +265,7 @@ pick_static() {
     mapfile -t images < <(find "$WALL_DIR" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | sort)
 
     if [ ${#images[@]} -eq 0 ]; then
-        notify-send -u normal "No wallpapers found" "Add images to $WALL_DIR/"
+        alert "No wallpapers found" normal "Add images to $WALL_DIR/"
         return 1
     fi
 
@@ -280,7 +291,7 @@ pick_static() {
     fi
 
     if [ ! -f "$selected" ]; then
-        notify-send -u critical "Wallpaper not found" "$selected"
+        alert "Wallpaper not found" critical "$selected"
         return 1
     fi
 
@@ -290,7 +301,7 @@ pick_static() {
 # ── Pick live wallpaper ──────────────────────────────────────────
 pick_live() {
     if [ ! -d "$LIVE_DIR" ]; then
-        notify-send -u critical "No live wallpapers" "Directory $LIVE_DIR does not exist"
+        alert "No live wallpapers" critical "Directory $LIVE_DIR does not exist"
         return 1
     fi
 
@@ -298,7 +309,7 @@ pick_live() {
     mapfile -t videos < <(find "$LIVE_DIR" -maxdepth 1 -type f \( -iname "*.mp4" -o -iname "*.webm" -o -iname "*.mkv" -o -iname "*.gif" \) | sort)
 
     if [ ${#videos[@]} -eq 0 ]; then
-        notify-send -u normal "No live wallpapers" "Add videos to $LIVE_DIR/"
+        alert "No live wallpapers" normal "Add videos to $LIVE_DIR/"
         return 1
     fi
 
@@ -320,7 +331,7 @@ pick_live() {
     fi
 
     if [ ! -f "$selected" ]; then
-        notify-send -u critical "Video not found" "$selected"
+        alert "Video not found" critical "$selected"
         return 1
     fi
 
