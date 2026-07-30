@@ -200,16 +200,10 @@ link_config() {
 setup_wallpapers() {
     mkdir -p "$WALL_DIR" "$WALL_DIR/live"
 
-    # Copy default wallpapers from repo
-    if [ -f "$DOTFILES_DIR/hypr/wallpapers/default.jpg" ]; then
-        cp -n "$DOTFILES_DIR/hypr/wallpapers/default.jpg" "$WALL_DIR/" 2>/dev/null || true
-        ok "Copied default wallpaper"
-    fi
-
-    if [ -f "$DOTFILES_DIR/hypr/wallpapers/lockscreen.jpg" ]; then
-        cp -n "$DOTFILES_DIR/hypr/wallpapers/lockscreen.jpg" "$WALL_DIR/" 2>/dev/null || true
-    fi
-
+    for f in "$DOTFILES_DIR/hypr/wallpapers"/* "$DOTFILES_DIR/Wallpapers"/*; do
+        [ -f "$f" ] || continue
+        cp -n "$f" "$WALL_DIR/" 2>/dev/null || true
+    done
     ok "Wallpaper directories ready: $WALL_DIR/ and $WALL_DIR/live/"
 }
 
