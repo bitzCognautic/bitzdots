@@ -33,7 +33,7 @@
       "max-title-length": 40
     },
     "volume": { "label": "󰕾", "show-per-app": true },
-    "backlight": { "label": "󰃟", "device": "intel_backlight" },
+    "backlight": { "label": "󰃟" },
     "dnd": {
       "text": "Do Not Disturb"
     },

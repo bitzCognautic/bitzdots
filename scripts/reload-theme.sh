@@ -1,7 +1,5 @@
 #!/bin/bash
-# Notify themed applications that colors changed — no kill commands, no app restarts
-set -euo pipefail
-
+# Notify themed applications that colors changed
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 
 echo ":: Theme files updated..."
@@ -22,12 +20,17 @@ if pgrep -x swaync > /dev/null; then
     echo "   SwayNC CSS reloaded"
 fi
 
-# --- Hyprland border colors: update via eval (avoids full config reload) ---
+# --- Hyprland border colors: update via keyword (compatible across all versions) ---
 if command -v hyprctl &>/dev/null && [ -f "$CONFIG_DIR/hypr/colors.lua" ]; then
     c1=$(grep "color1" "$CONFIG_DIR/hypr/colors.lua" | head -1 | sed "s/.*= \"\(.*\)\",/\1/" || true)
     c4=$(grep "color4" "$CONFIG_DIR/hypr/colors.lua" | head -1 | sed "s/.*= \"\(.*\)\",/\1/" || true)
     c8=$(grep "color8" "$CONFIG_DIR/hypr/colors.lua" | head -1 | sed "s/.*= \"\(.*\)\",/\1/" || true)
-    [ -n "$c1" ] && [ -n "$c4" ] && hyprctl eval "hl.config({ general = { col = { active_border = { colors = {\"rgba(${c1}ee)\", \"rgba(${c4}ee)\"}, angle = 45 }, inactive_border = \"rgba(${c8}ee)\" } } })" &>/dev/null || true
+    if [ -n "$c1" ] && [ -n "$c4" ]; then
+        hyprctl keyword general:col.active_border "rgba(${c1}ee) rgba(${c4}ee) 45deg" &>/dev/null || true
+    fi
+    if [ -n "$c8" ]; then
+        hyprctl keyword general:col.inactive_border "rgba(${c8}ee)" &>/dev/null || true
+    fi
     echo "   Hyprland border colors updated"
 fi
 
