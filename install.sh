@@ -641,21 +641,29 @@ if command -v gsettings &>/dev/null; then
     gsettings set org.gnome.desktop.interface color-scheme prefer-dark 2>/dev/null || true
 fi
 
-# Force dark mode in Chromium/Chrome/Brave via managed policy
-browser_policies=(
-    "/etc/chromium/policies/managed/dark-mode.json"
-    "/etc/opt/chrome/policies/managed/dark-mode.json"
-    "/etc/brave/policies/managed/dark-mode.json"
-)
-policy_content='{"BrowserThemeColor": "#1e1e2e", "DarkModeAvailable": true, "DarkModeEnabled": true}'
-for policy_path in "${browser_policies[@]}"; do
-    policy_dir=$(dirname "$policy_path")
-    if [ ! -d "$policy_dir" ]; then
-        sudo mkdir -p "$policy_dir" 2>/dev/null || continue
+# Force dark mode in Chromium/Chrome/Brave via desktop file overrides
+# (Uses --force-dark-mode flag instead of managed policy to avoid
+#  "set by your organization" warning)
+force_browser_dark() {
+    local desktop_file=$1
+    [ -f "$desktop_file" ] || return 1
+    local local_file="$HOME/.local/share/applications/$(basename "$desktop_file")"
+    mkdir -p "$HOME/.local/share/applications"
+    if [ -f "$local_file" ] && grep -q -- "--force-dark-mode" "$local_file" 2>/dev/null; then
+        return 0
     fi
-    echo "$policy_content" | sudo tee "$policy_path" >/dev/null 2>&1 || true
-done
-log "Dark theme enforced for GTK4, Chromium, Chrome, Brave"
+    sed 's|^Exec=\(.*\)%[UF]|Exec=\1--force-dark-mode %U|' \
+        "$desktop_file" > "$local_file" 2>/dev/null || return 1
+    chmod +x "$local_file" 2>/dev/null || true
+}
+force_browser_dark "/usr/share/applications/brave-browser.desktop"
+force_browser_dark "/usr/share/applications/chromium.desktop"
+force_browser_dark "/usr/share/applications/google-chrome.desktop"
+# Clean up any previously created managed policies that cause "set by your org" warning
+sudo rm -f /etc/chromium/policies/managed/dark-mode.json \
+           /etc/opt/chrome/policies/managed/dark-mode.json \
+           /etc/brave/policies/managed/dark-mode.json 2>/dev/null || true
+log "Dark theme enforced for Chromium/Chrome/Brave (desktop overrides)"
 
 # Restart xdg-desktop-portal-hyprland to prevent CPU loop (known 1.4.x issue)
 if systemctl --user is-active xdg-desktop-portal-hyprland &>/dev/null; then
