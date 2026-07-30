@@ -45,6 +45,10 @@ The install script will:
 - `grim` — Screenshots
 - `swaybg` or `hyprpaper` — Wallpaper
 
+**Qt (dark theme):**
+- `qt5ct` — Qt5 theme configuration
+- `qt6ct` — Qt6 theme configuration
+
 **Optional:**
 - `power-profiles-daemon` — Power profiles
 
