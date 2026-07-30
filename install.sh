@@ -92,6 +92,14 @@ install_deps() {
                     warn "  $pkg not installed — install manually if needed"
                 fi
             done
+
+            # Try to replace xdg-desktop-portal-hyprland with git version (fixes CPU loop)
+            if pacman -Q xdg-desktop-portal-hyprland 2>/dev/null | grep -q "1.4" && \
+               ! pacman -Q xdg-desktop-portal-hyprland-git 2>/dev/null; then
+                log "Installing xdg-desktop-portal-hyprland-git (fixes CPU loop)..."
+                install_aur_pkg xdg-desktop-portal-hyprland-git || \
+                    warn "  Could not replace portal — will use autostart workaround instead"
+            fi
             ;;
         fedora)
             log "Installing packages (Fedora)..."

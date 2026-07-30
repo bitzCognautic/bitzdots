@@ -14,4 +14,7 @@ hl.on("hyprland.start", function()
 
     -- Wallust palette cache daemon runs as a systemd user service
     -- (wallust-cache-daemon.service) — no need to start it here
+
+    -- Restart portal to prevent CPU loop (known xdg-desktop-portal-hyprland 1.4.x bug)
+    hl.exec_cmd("bash -c 'sleep 3 && systemctl --user restart xdg-desktop-portal-hyprland &>/dev/null'")
 end)
