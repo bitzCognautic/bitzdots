@@ -236,6 +236,9 @@ install_scripts() {
         ln -sf "$t" "$scripts_dir/templates/"
     done
 
+    mkdir -p "$HOME/.local/bin"
+    ln -sf "$DOTFILES_DIR/scripts/hyprlogout" "$HOME/.local/bin/hyprlogout"
+
     ok "Wallust scripts and templates linked"
 }
 
