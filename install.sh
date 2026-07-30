@@ -641,29 +641,13 @@ if command -v gsettings &>/dev/null; then
     gsettings set org.gnome.desktop.interface color-scheme prefer-dark 2>/dev/null || true
 fi
 
-# Force dark mode in Chromium/Chrome/Brave via desktop file overrides
-# (Uses --force-dark-mode flag instead of managed policy to avoid
-#  "set by your organization" warning)
-force_browser_dark() {
-    local desktop_file=$1
-    [ -f "$desktop_file" ] || return 1
-    local local_file="$HOME/.local/share/applications/$(basename "$desktop_file")"
-    mkdir -p "$HOME/.local/share/applications"
-    if [ -f "$local_file" ] && grep -q -- "--force-dark-mode" "$local_file" 2>/dev/null; then
-        return 0
-    fi
-    sed 's|^Exec=\(.*\)%[UF]|Exec=\1--force-dark-mode %U|' \
-        "$desktop_file" > "$local_file" 2>/dev/null || return 1
-    chmod +x "$local_file" 2>/dev/null || true
-}
-force_browser_dark "/usr/share/applications/brave-browser.desktop"
-force_browser_dark "/usr/share/applications/chromium.desktop"
-force_browser_dark "/usr/share/applications/google-chrome.desktop"
-# Clean up any previously created managed policies that cause "set by your org" warning
-sudo rm -f /etc/chromium/policies/managed/dark-mode.json \
-           /etc/opt/chrome/policies/managed/dark-mode.json \
-           /etc/brave/policies/managed/dark-mode.json 2>/dev/null || true
-log "Dark theme enforced for Chromium/Chrome/Brave (desktop overrides)"
+# Clean up stale browser policy files/desktop overrides from previous versions
+sudo rm -rf /etc/chromium/policies/managed \
+            /etc/opt/chrome/policies/managed \
+            /etc/brave/policies/managed 2>/dev/null || true
+rm -f "$HOME/.local/share/applications/brave-browser.desktop" \
+      "$HOME/.local/share/applications/chromium.desktop" \
+      "$HOME/.local/share/applications/google-chrome.desktop" 2>/dev/null || true
 
 # Restart xdg-desktop-portal-hyprland to prevent CPU loop (known 1.4.x issue)
 if systemctl --user is-active xdg-desktop-portal-hyprland &>/dev/null; then
