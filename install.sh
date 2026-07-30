@@ -20,7 +20,6 @@ ok()   { echo -e "${GREEN}[  ok  ]${NC} $1"; }
 warn() { echo -e "${YELLOW}[ warn ]${NC} $1"; }
 fail() { echo -e "${RED}[ fail ]${NC} $1"; exit 1; }
 
-# ── Detect distro ────────────────────────────────────────────────
 detect_distro() {
     if [ -f /etc/arch-release ]; then
         echo "arch"
@@ -38,52 +37,46 @@ detect_distro() {
 install_deps() {
     local distro
     distro=$(detect_distro)
-
     log "Detected distro: $distro"
 
     case "$distro" in
         arch)
             log "Installing packages (Arch)..."
-            # pacman packages
-            sudo pacman -S --needed --noconfirm \
-                waybar swaync rofi kitty cava \
-                awww hyprpicker wl-clipboard playerctl pavucontrol \
-                polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
-                impala bluetui btop pulsemixer wf-recorder python \
-                power-profiles-daemon breeze inotify-tools fish fastfetch wallust \
-                brightnessctl bluez bluez-utils libnotify networkmanager \
-                wireplumber pipewire-pulse curl jq imagemagick \
-                nautilus wofi papirus-icon-theme 2>&1 | \
+            local repo_pkgs=(
+                waybar swaync wlogout rofi kitty cava
+                hyprpicker wl-clipboard playerctl pavucontrol
+                polkit-kde-agent grim slurp cliphist hyprlock ffmpeg
+                btop pulsemixer wf-recorder python
+                power-profiles-daemon breeze inotify-tools fish fastfetch
+                brightnessctl bluez bluez-utils libnotify networkmanager
+                wireplumber pipewire-pulse curl jq imagemagick
+                nautilus wofi papirus-icon-theme wallust bluetui
+            )
+            local missing=()
+            sudo pacman -S --needed --noconfirm "${repo_pkgs[@]}" 2>&1 | \
                 grep -o "target not found: [^']*" | cut -d' ' -f4 > /tmp/missing_pkgs.txt || true
-
-
-            # AUR packages via paru
-            if command -v paru &>/dev/null && [ -s /tmp/missing_pkgs.txt ]; then
-                local aur_pkgs=()
-                while IFS= read -r pkg; do
-                    aur_pkgs+=("$pkg")
-                done < /tmp/missing_pkgs.txt
-                # qt6ct-kde replaces qt6ct for KDE app theming
-                if [[ " ${aur_pkgs[*]} " =~ " qt6ct " ]]; then
-                    aur_pkgs=("${aur_pkgs[@]/qt6ct/qt6ct-kde}")
-                fi
-                log "Installing AUR packages via paru: ${aur_pkgs[*]}"
-                paru -S --needed --noconfirm "${aur_pkgs[@]}" || true
-            elif [ -s /tmp/missing_pkgs.txt ]; then
-                warn "paru not found. Install AUR packages manually:"
-                while IFS= read -r pkg; do
-                    echo "  paru -S $pkg"
-                done < /tmp/missing_pkgs.txt
+            if [ -s /tmp/missing_pkgs.txt ]; then
+                mapfile -t missing < /tmp/missing_pkgs.txt
             fi
             rm -f /tmp/missing_pkgs.txt
+            missing+=(awww impala)
+
+            if command -v paru &>/dev/null; then
+                log "Installing via paru: ${missing[*]}"
+                paru -S --needed --noconfirm "${missing[@]}" || true
+            elif command -v yay &>/dev/null; then
+                yay -S --needed --noconfirm "${missing[@]}" || true
+            else
+                warn "No AUR helper found. Install manually:"
+                printf '  paru -S %s\n' "${missing[@]}"
+            fi
+            # Cargo fallback for wallust
             if ! command -v wallust &>/dev/null; then
                 if command -v cargo &>/dev/null; then
                     warn "Installing wallust via cargo..."
-                    cargo install wallust
+                    cargo install wallust || true
                 else
-                    warn "wallust not installed. Install manually:"
-                    echo "  cargo install wallust"
-                    echo "  (or paru -S wallust)"
+                    warn "wallust not installed — run: cargo install wallust"
                 fi
             fi
             ;;
@@ -99,8 +92,11 @@ install_deps() {
                 NetworkManager wireplumber pipewire-pulseaudio \
                 curl jq ImageMagick nautilus wofi papirus-icon-theme
             if ! command -v wallust &>/dev/null; then
-                warn "wallust not in repos, installing via cargo..."
-                cargo install wallust
+                if command -v cargo &>/dev/null; then
+                    cargo install wallust || true
+                else
+                    warn "wallust not installed — run: cargo install wallust"
+                fi
             fi
             ;;
         debian)
@@ -115,8 +111,11 @@ install_deps() {
                 network-manager wireplumber pipewire-pulse \
                 curl jq imagemagick nautilus wofi papirus-icon-theme
             if ! command -v wallust &>/dev/null; then
-                warn "wallust not in repos, installing via cargo..."
-                cargo install wallust
+                if command -v cargo &>/dev/null; then
+                    cargo install wallust || true
+                else
+                    warn "wallust not installed — run: cargo install wallust"
+                fi
             fi
             ;;
         nixos)
@@ -133,6 +132,7 @@ install_deps() {
             echo "    networkmanager wireplumber pipewire-pulse"
             echo "    curl jq imagemagick nautilus wofi papirus-icon-theme"
             echo "  ];"
+            echo "  services.bluetooth.enable = true;"
             ;;
         *)
             warn "Unknown distro. Please install manually:"
@@ -155,23 +155,17 @@ install_nerd_font() {
         return
     fi
 
-    log "Installing JetBrainsMono Nerd Font from AUR..."
+    log "Installing JetBrainsMono Nerd Font..."
 
     if command -v paru &>/dev/null; then
-        paru -S --needed --noconfirm ttf-jetbrains-mono-nerd && {
-            ok "JetBrainsMono Nerd Font installed via paru"
-            return
-        }
+        paru -S --needed --noconfirm ttf-jetbrains-mono-nerd && return
     fi
 
     if command -v yay &>/dev/null; then
-        yay -S --needed --noconfirm ttf-jetbrains-mono-nerd && {
-            ok "JetBrainsMono Nerd Font installed via yay"
-            return
-        }
+        yay -S --needed --noconfirm ttf-jetbrains-mono-nerd && return
     fi
 
-    warn "No AUR helper found (paru/yay). Install manually: paru -S ttf-jetbrains-mono-nerd"
+    warn "No AUR helper found. Install manually: paru -S ttf-jetbrains-mono-nerd"
 }
 
 link_config() {
@@ -179,9 +173,7 @@ link_config() {
     local dest="$2"
     local name="$3"
 
-    if [ ! -e "$src" ]; then
-        return
-    fi
+    [ -e "$src" ] || return
 
     if [ -e "$dest" ] && [ ! -L "$dest" ]; then
         warn "$name config exists at $dest — backing up to ${dest}.bak"
@@ -189,22 +181,19 @@ link_config() {
     fi
 
     if [ -L "$dest" ]; then
-        log "$name config already linked"
         return
     fi
 
     ln -sf "$src" "$dest"
-    ok "$name config linked: $src → $dest"
 }
 
 setup_wallpapers() {
     mkdir -p "$WALL_DIR" "$WALL_DIR/live"
-
     for f in "$DOTFILES_DIR/hypr/wallpapers"/* "$DOTFILES_DIR/Wallpapers"/*; do
         [ -f "$f" ] || continue
         cp -n "$f" "$WALL_DIR/" 2>/dev/null || true
     done
-    ok "Wallpaper directories ready: $WALL_DIR/ and $WALL_DIR/live/"
+    ok "Wallpapers ready: $WALL_DIR/"
 }
 
 setup_cache() {
@@ -213,112 +202,55 @@ setup_cache() {
 
 setup_runcat() {
     local module_dir="$CONFIG_DIR/waybar/modules/runcat-text"
-
-    if [ ! -d "$DOTFILES_DIR/waybar/modules/runcat-text" ]; then
-        warn "runcat-text module not found in dotfiles — skipping"
-        return
-    fi
+    [ -d "$DOTFILES_DIR/waybar/modules/runcat-text" ] || return
 
     mkdir -p "$module_dir"
     cp "$DOTFILES_DIR/waybar/modules/runcat-text"/* "$module_dir/"
-    ok "runcat-text module files copied"
 
-    # Install font
     local font_dir="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"
     mkdir -p "$font_dir"
     if [ -f "$module_dir/runcat.ttf" ] && ! fc-list :family 2>/dev/null | grep -qi "runcat"; then
         cp "$module_dir/runcat.ttf" "$font_dir/"
         fc-cache -f 2>/dev/null || true
-        ok "runcat font installed"
-    else
-        ok "runcat font already installed"
     fi
 
-    # Set up Python venv
-    if [ ! -f "$module_dir/.venv/bin/python" ]; then
-        if command -v python &>/dev/null; then
-            python -m venv "$module_dir/.venv"
-            "$module_dir/.venv/bin/pip" install -q "$module_dir/requirements.txt" 2>/dev/null || \
-                "$module_dir/.venv/bin/pip" install -q pyjson5 2>/dev/null || \
-                warn "runcat Python deps not installed (pyjson5 missing)"
-            ok "runcat Python venv created"
-        else
-            warn "python not found — runcat-text requires python"
-        fi
-    else
-        ok "runcat Python venv already exists"
+    if [ ! -f "$module_dir/.venv/bin/python" ] && command -v python &>/dev/null; then
+        python -m venv "$module_dir/.venv"
+        "$module_dir/.venv/bin/pip" install -q "$module_dir/requirements.txt" 2>/dev/null || \
+            "$module_dir/.venv/bin/pip" install -q pyjson5 2>/dev/null || true
     fi
-
     ok "runcat-text setup complete"
 }
 
 install_scripts() {
     local scripts_dir="$CONFIG_DIR/wallust"
-
     mkdir -p "$scripts_dir/templates"
 
-    # Install scripts — note: cache-wallpapers.sh is kept for manual use,
-    # the --daemon mode has been replaced by wallust-cache-daemon.sh
     for s in reload-theme.sh wallpaper-select.sh cache-wallpapers.sh wallust-cache-daemon.sh record-fullscreen.sh record-region.sh recording-indicator.sh; do
         ln -sf "$DOTFILES_DIR/scripts/$s" "$scripts_dir/$s"
     done
-    ok "wallust scripts linked"
 
-    # Install wallust config
     ln -sf "$DOTFILES_DIR/wallust/wallust.toml" "$scripts_dir/wallust.toml"
-    ok "wallust.toml linked"
 
-    # Install templates
     for t in "$DOTFILES_DIR/wallust/templates"/*; do
         ln -sf "$t" "$scripts_dir/templates/"
     done
-    ok "wallust templates linked"
+
+    ok "Wallust scripts and templates linked"
 }
 
 make_executable() {
-    for s in "$CONFIG_DIR/waybar/scripts"/*.sh; do
-        chmod +x "$s" 2>/dev/null || true
+    for d in "$CONFIG_DIR/waybar/scripts" "$CONFIG_DIR/rofi/scripts" "$CONFIG_DIR/wallust"; do
+        for s in "$d"/*.sh; do
+            chmod +x "$s" 2>/dev/null || true
+        done
     done
-    for s in "$CONFIG_DIR/rofi/scripts"/*.sh; do
-        chmod +x "$s" 2>/dev/null || true
-    done
-    for s in "$CONFIG_DIR/wallust"/*.sh; do
-        chmod +x "$s" 2>/dev/null || true
-    done
-    chmod +x "$CONFIG_DIR/rofi/scripts/script_wallpaper.sh" 2>/dev/null || true
     chmod +x "$HOME/.local/bin/hyprlogout" 2>/dev/null || true
     ok "Scripts made executable"
 }
 
-link_dotfiles() {
-    log "Linking dotfiles..."
-
-    mkdir -p "$CONFIG_DIR/waybar"
-    mkdir -p "$CONFIG_DIR/swaync"
-    mkdir -p "$CONFIG_DIR/wlogout"
-    mkdir -p "$CONFIG_DIR/hypr"
-    mkdir -p "$CONFIG_DIR/rofi"
-    mkdir -p "$CONFIG_DIR/cava"
-    mkdir -p "$CONFIG_DIR/kitty"
-    mkdir -p "$CONFIG_DIR/waybar/scripts"
-    mkdir -p "$CONFIG_DIR/waybar/colors"
-    mkdir -p "$CONFIG_DIR/cava/themes"
-    mkdir -p "$CONFIG_DIR/cava/shaders"
-    mkdir -p "$CONFIG_DIR/wlogout/assets"
-    mkdir -p "$CONFIG_DIR/wlogout/icons"
-    mkdir -p "$CONFIG_DIR/wlogout/actions"
-    mkdir -p "$CONFIG_DIR/swaync"
-    mkdir -p "$CONFIG_DIR/rofi/themes"
-    mkdir -p "$CONFIG_DIR/rofi/colors"
-    mkdir -p "$CONFIG_DIR/rofi/launchers"
-    mkdir -p "$CONFIG_DIR/rofi/scripts"
-    mkdir -p "$CONFIG_DIR/rofi/icons"
-    mkdir -p "$CONFIG_DIR/gtk-3.0"
-    mkdir -p "$CONFIG_DIR/gtk-4.0"
-    mkdir -p "$CONFIG_DIR/environment.d"
-    mkdir -p "$CONFIG_DIR/fish"
-    mkdir -p "$CONFIG_DIR/fastfetch"
-    # Waybar
+install_waybar_config() {
+    mkdir -p "$CONFIG_DIR/waybar/scripts" "$CONFIG_DIR/waybar/colors"
     link_config "$DOTFILES_DIR/waybar/config.jsonc" "$CONFIG_DIR/waybar/config.jsonc" "waybar"
     link_config "$DOTFILES_DIR/waybar/style.css" "$CONFIG_DIR/waybar/style.css" "waybar"
     link_config "$DOTFILES_DIR/waybar/colors/teto.css" "$CONFIG_DIR/waybar/colors/teto.css" "waybar"
@@ -331,51 +263,55 @@ link_dotfiles() {
     for s in "$DOTFILES_DIR/scripts"/record*.sh; do
         link_config "$s" "$CONFIG_DIR/waybar/scripts/$(basename "$s")" "waybar"
     done
+}
 
-    # Hyprland
+install_hypr_config() {
+    mkdir -p "$CONFIG_DIR/hypr"
     for f in "$DOTFILES_DIR/hypr"/*.lua; do
         link_config "$f" "$CONFIG_DIR/hypr/$(basename "$f")" "hyprland"
     done
+}
 
-    # SwayNC
+install_swaync_config() {
+    mkdir -p "$CONFIG_DIR/swaync"
     link_config "$DOTFILES_DIR/swaync/config.json" "$CONFIG_DIR/swaync/config.json" "swaync"
     link_config "$DOTFILES_DIR/swaync/style.css" "$CONFIG_DIR/swaync/style.css" "swaync"
     link_config "$DOTFILES_DIR/swaync/media-swaync.sh" "$CONFIG_DIR/swaync/media-swaync.sh" "swaync"
     link_config "$DOTFILES_DIR/swaync/bt-status.sh" "$CONFIG_DIR/swaync/bt-status.sh" "swaync"
+}
 
-    # GTK3/4 dark theme
+install_gtk_config() {
+    mkdir -p "$CONFIG_DIR/gtk-3.0" "$CONFIG_DIR/gtk-4.0"
     link_config "$DOTFILES_DIR/gtk/gtk-3.0/settings.ini" "$CONFIG_DIR/gtk-3.0/settings.ini" "gtk3"
     link_config "$DOTFILES_DIR/gtk/gtk-4.0/settings.ini" "$CONFIG_DIR/gtk-4.0/settings.ini" "gtk4"
+}
 
-    # Wlogout
+install_wlogout_config() {
+    mkdir -p "$CONFIG_DIR/wlogout/assets" "$CONFIG_DIR/wlogout/icons" "$CONFIG_DIR/wlogout/actions"
     link_config "$DOTFILES_DIR/wlogout/style.css" "$CONFIG_DIR/wlogout/style.css" "wlogout"
     link_config "$DOTFILES_DIR/wlogout/layout" "$CONFIG_DIR/wlogout/layout" "wlogout"
-    for f in "$DOTFILES_DIR/wlogout/assets"/*; do
-        link_config "$f" "$CONFIG_DIR/wlogout/assets/$(basename "$f")" "wlogout"
+    for d in assets icons actions; do
+        for f in "$DOTFILES_DIR/wlogout/$d"/*; do
+            link_config "$f" "$CONFIG_DIR/wlogout/$d/$(basename "$f")" "wlogout"
+        done
     done
-    for f in "$DOTFILES_DIR/wlogout/icons"/*; do
-        link_config "$f" "$CONFIG_DIR/wlogout/icons/$(basename "$f")" "wlogout"
-    done
-    for f in "$DOTFILES_DIR/wlogout/actions"/*; do
-        link_config "$f" "$CONFIG_DIR/wlogout/actions/$(basename "$f")" "wlogout"
-    done
+}
 
-    # Rofi
+install_rofi_config() {
+    mkdir -p "$CONFIG_DIR/rofi/themes" "$CONFIG_DIR/rofi/colors" "$CONFIG_DIR/rofi/launchers" "$CONFIG_DIR/rofi/scripts" "$CONFIG_DIR/rofi/icons"
     link_config "$DOTFILES_DIR/rofi/config.rasi" "$CONFIG_DIR/rofi/config.rasi" "rofi"
-    for f in "$DOTFILES_DIR/rofi/colors"/*.rasi; do
-        link_config "$f" "$CONFIG_DIR/rofi/colors/$(basename "$f")" "rofi"
-    done
-    for f in "$DOTFILES_DIR/rofi/themes"/*.rasi; do
-        link_config "$f" "$CONFIG_DIR/rofi/themes/$(basename "$f")" "rofi"
+    for d in colors themes; do
+        for f in "$DOTFILES_DIR/rofi/$d"/*.rasi; do
+            link_config "$f" "$CONFIG_DIR/rofi/$d/$(basename "$f")" "rofi"
+        done
     done
     for f in "$DOTFILES_DIR/rofi/launchers"/*; do
-        if [ -f "$f" ]; then link_config "$f" "$CONFIG_DIR/rofi/launchers/$(basename "$f")" "rofi"; fi
+        [ -f "$f" ] && link_config "$f" "$CONFIG_DIR/rofi/launchers/$(basename "$f")" "rofi"
     done
     link_config "$DOTFILES_DIR/rofi/scripts/script_wallpaper.sh" "$CONFIG_DIR/rofi/scripts/script_wallpaper.sh" "rofi"
     link_config "$DOTFILES_DIR/rofi/scripts/system-power.sh" "$CONFIG_DIR/rofi/scripts/system-power.sh" "rofi"
     link_config "$DOTFILES_DIR/rofi/scripts/clipboard.sh" "$CONFIG_DIR/rofi/scripts/clipboard.sh" "rofi"
-
-    # Rofi icons (power menu + wallpaper selector)
+    # Icons
     link_config "$DOTFILES_DIR/icons/lock-outline-sharp.svg" "$CONFIG_DIR/rofi/icons/lock.svg" "rofi"
     link_config "$DOTFILES_DIR/icons/logout-sharp.svg" "$CONFIG_DIR/rofi/icons/logout.svg" "rofi"
     link_config "$DOTFILES_DIR/icons/sleep.svg" "$CONFIG_DIR/rofi/icons/sleep.svg" "rofi"
@@ -384,68 +320,64 @@ link_dotfiles() {
     link_config "$DOTFILES_DIR/icons/cancel-outline.svg" "$CONFIG_DIR/rofi/icons/cancel.svg" "rofi"
     link_config "$DOTFILES_DIR/icons/static.svg" "$CONFIG_DIR/rofi/icons/static.svg" "rofi"
     link_config "$DOTFILES_DIR/icons/live.svg" "$CONFIG_DIR/rofi/icons/live.svg" "rofi"
+}
 
-    # Cava
+install_cava_config() {
+    mkdir -p "$CONFIG_DIR/cava/themes" "$CONFIG_DIR/cava/shaders"
     link_config "$DOTFILES_DIR/cava/config" "$CONFIG_DIR/cava/config" "cava"
     for f in "$DOTFILES_DIR/cava/shaders"/*; do
         link_config "$f" "$CONFIG_DIR/cava/shaders/$(basename "$f")" "cava"
     done
+}
 
-    # Kitty — link config from dotfiles
+link_dotfiles() {
+    log "Linking dotfiles..."
+    install_waybar_config
+    install_hypr_config
+    install_swaync_config
+    install_gtk_config
+    install_wlogout_config
+    install_rofi_config
+    install_cava_config
+    mkdir -p "$CONFIG_DIR/kitty"
     link_config "$DOTFILES_DIR/kitty/kitty.conf" "$CONFIG_DIR/kitty/kitty.conf" "kitty"
-
-    # Qt environment
+    mkdir -p "$CONFIG_DIR/environment.d"
     link_config "$DOTFILES_DIR/environment.d/qt.conf" "$CONFIG_DIR/environment.d/qt.conf" "qt"
-
-    # Fish
+    mkdir -p "$CONFIG_DIR/fish"
     link_config "$DOTFILES_DIR/fish/config.fish" "$CONFIG_DIR/fish/config.fish" "fish"
-
-    # Fastfetch
+    mkdir -p "$CONFIG_DIR/fastfetch"
     link_config "$DOTFILES_DIR/fastfetch/config.jsonc" "$CONFIG_DIR/fastfetch/config.jsonc" "fastfetch"
     link_config "$DOTFILES_DIR/fastfetch/bitz.txt" "$CONFIG_DIR/fastfetch/bitz.txt" "fastfetch"
 }
 
-# ── Fix hardcoded paths ─────────────────────────────────────────
 fix_paths() {
-    log "Fixing hardcoded paths (if any)..."
-
+    log "Fixing hardcoded paths..."
     local files=(
         "$DOTFILES_DIR/rofi/config.rasi"
         "$DOTFILES_DIR/rofi/scripts/script_wallpaper.sh"
         "$DOTFILES_DIR/rofi/launchers/type-6/style-4.rasi"
         "$DOTFILES_DIR/rofi/themes/wallpaper-grid.rasi"
     )
-
     for file in "${files[@]}"; do
-        if [ -f "$file" ]; then
-            sed -i "s|/home/lucario|$HOME|g; s|/home/bitz|$HOME|g" "$file" 2>/dev/null || true
-        fi
+        [ -f "$file" ] && sed -i "s|/home/lucario|$HOME|g; s|/home/bitz|$HOME|g" "$file" 2>/dev/null || true
     done
-
-    ok "Paths fixed in repo files"
+    ok "Paths fixed"
 }
 
-# ── Keybind for wallpaper picker ─────────────────────────────────
 add_keybind() {
     local keybind_file="$CONFIG_DIR/hypr/keybinds.lua"
-    local line='hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("~/.config/wallust/wallpaper-select.sh"))'
-
-    if [ -f "$keybind_file" ]; then
-        if ! grep -q "wallpaper-select" "$keybind_file" 2>/dev/null; then
-            echo "" >> "$keybind_file"
-            echo "-- Wallpaper selector" >> "$keybind_file"
-            echo "$line" >> "$keybind_file"
-            ok "Keybind added: SUPER+SHIFT+W = wallpaper picker"
-        else
-            ok "Keybind already exists"
-        fi
-    fi
+    [ -f "$keybind_file" ] || return
+    grep -q "wallpaper-select" "$keybind_file" 2>/dev/null && return
+    echo "" >> "$keybind_file"
+    echo "-- Wallpaper selector" >> "$keybind_file"
+    echo 'hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("~/.config/wallust/wallpaper-select.sh"))' >> "$keybind_file"
+    ok "Keybind added: SUPER+SHIFT+W = wallpaper picker"
 }
 
-# ── Generate initial theme ──────────────────────────────────────
 generate_initial_theme() {
-    local initial_wall=""
+    command -v wallust &>/dev/null || { warn "wallust not installed — skipping theme generation"; return; }
 
+    local initial_wall=""
     for img in $(find "$WALL_DIR" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | sort); do
         if wallust run "$img" --config-dir "$CONFIG_DIR/wallust" -q 2>/dev/null; then
             initial_wall="$img"
@@ -453,27 +385,33 @@ generate_initial_theme() {
         fi
     done
 
-    if [ -z "$initial_wall" ]; then
-        warn "No suitable wallpaper found in $WALL_DIR — skipping initial theme"
-        return
-    fi
+    [ -n "$initial_wall" ] || { warn "No suitable wallpaper found — skipping theme generation"; return; }
 
-    log "Generating initial theme from: $(basename "$initial_wall")"
-
-    # Cache it so autostart restores it
+    log "Generating theme from: $(basename "$initial_wall")"
     echo "$initial_wall" > "$CACHE_DIR/current_wallpaper.txt" 2>/dev/null || true
     ln -sf "$initial_wall" "$CACHE_DIR/current_wallpaper.png" 2>/dev/null || true
 
-    # Set wallpaper now if awww is available
     if command -v awww &>/dev/null; then
-        if ! pgrep -x awww-daemon > /dev/null 2>&1; then
-            awww-daemon &
-            sleep 0.5
-        fi
+        pgrep -x awww-daemon > /dev/null 2>&1 || { awww-daemon & sleep 0.5; }
         awww img "$initial_wall" --transition-type grow --transition-duration 1 2>/dev/null || true
     fi
 
-    ok "Initial theme generated from $(basename "$initial_wall")"
+    ok "Theme generated from $(basename "$initial_wall")"
+}
+
+install_systemd_services() {
+    log "Installing systemd services..."
+    mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
+    cp "$DOTFILES_DIR/systemd/user/wallust-cache-daemon.service" \
+       "${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user/wallust-cache-daemon.service"
+    systemctl --user daemon-reload 2>/dev/null || true
+    systemctl --user enable --now wallust-cache-daemon.service 2>/dev/null || true
+    ok "wallust-cache-daemon service started"
+
+    if command -v bluetoothctl &>/dev/null; then
+        sudo systemctl enable --now bluetooth.service 2>/dev/null || true
+        ok "Bluetooth service enabled"
+    fi
 }
 
 # ═══════════════════════════════════════════════════════════════
@@ -486,7 +424,6 @@ echo -e "${CYAN}║     bitzdots — Auto Installer     ║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════╝${NC}"
 echo ""
 
-# Parse args
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --help|-h)
@@ -500,7 +437,6 @@ while [[ $# -gt 0 ]]; do
 done
 
 install_deps
-
 setup_wallpapers
 setup_cache
 mkdir -p "$HOME/Pictures/Screenshots/Fullscreen" "$HOME/Pictures/Screenshots/Freeform" 2>/dev/null || true
@@ -512,25 +448,11 @@ setup_runcat
 fix_paths
 add_keybind
 generate_initial_theme
-
-# Install systemd user service for cache daemon
-log "Installing systemd user service..."
-mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
-cp "$DOTFILES_DIR/systemd/user/wallust-cache-daemon.service" \
-   "${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user/wallust-cache-daemon.service"
-systemctl --user daemon-reload 2>/dev/null || true
-systemctl --user enable --now wallust-cache-daemon.service 2>/dev/null || true
-ok "wallust-cache-daemon systemd service installed and started"
-
-# Enable bluetooth service if bluez is installed
-if command -v bluetoothctl &>/dev/null; then
-    sudo systemctl enable --now bluetooth.service 2>/dev/null || true
-    ok "Bluetooth service enabled"
-fi
+install_systemd_services
 
 echo ""
 echo -e "${GREEN}╔══════════════════════════════════╗${NC}"
-echo -e "${GREEN}║     Installation complete!            ║${NC}"
+echo -e "${GREEN}║     Installation complete!       ║${NC}"
 echo -e "${GREEN}╚══════════════════════════════════╝${NC}"
 echo ""
 echo -e "  ${YELLOW}Usage:${NC}"
@@ -540,9 +462,8 @@ echo -e "  ${YELLOW}Or run manually:${NC}"
 echo "    ~/.config/wallust/wallpaper-select.sh"
 echo ""
 echo -e "  ${YELLOW}Notes:${NC}"
-echo "    • Add static wallpapers to $WALL_DIR/"
+echo "    • Add wallpapers to $WALL_DIR/"
 echo "    • Add live wallpapers (.mp4/.webm/.gif) to $WALL_DIR/live/"
 echo "    • To manually generate theme: wallust run <wallpaper>"
-echo "    • Edit templates in ~/.config/wallust/templates/"
 echo "    • Install mpvpaper for live wallpaper support"
 echo ""
