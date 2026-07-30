@@ -50,7 +50,7 @@ install_deps() {
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
                 impala bluetui btop pulsemixer wf-recorder python \
-                power-profiles-daemon breeze inotify-tools fish fastfetch 2>&1 | \
+                power-profiles-daemon breeze inotify-tools fish fastfetch wallust 2>&1 | \
                 grep -o "target not found: [^']*" | cut -d' ' -f4 > /tmp/missing_pkgs.txt || true
 
 
@@ -76,13 +76,12 @@ install_deps() {
             ;;
         fedora)
             log "Installing packages (Fedora)..."
-            # wallust may need to be installed from copr or cargo
             sudo dnf install -y \
                 waybar swaync wlogout rofi kitty cava \
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
-                inotify-tools
-            # Install wallust from crates.io
+                inotify-tools fish fastfetch btop pulsemixer \
+                wf-recorder python3 impala
             if ! command -v wallust &>/dev/null; then
                 warn "wallust not in repos, installing via cargo..."
                 cargo install wallust
@@ -94,7 +93,8 @@ install_deps() {
                 waybar swaync wlogout rofi kitty cava \
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
-                inotify-tools
+                inotify-tools fish fastfetch btop pulsemixer \
+                wf-recorder python3
             if ! command -v wallust &>/dev/null; then
                 warn "wallust not in repos, installing via cargo..."
                 cargo install wallust
@@ -109,6 +109,7 @@ install_deps() {
             echo "    wallust swaync wlogout kitty cava inotify-tools"
             echo "    hyprpicker wl-clipboard playerctl pavucontrol"
             echo "    polkit-kde-agent grim slurp cliphist hyprlock ffmpeg"
+            echo "    fish fastfetch btop pulsemixer wf-recorder python3"
             echo "  ];"
             ;;
         *)
@@ -118,6 +119,7 @@ install_deps() {
             echo "  - awww, hyprpicker, wl-clipboard, playerctl"
             echo "  - pavucontrol, polkit-kde-agent, grim, slurp, cliphist"
             echo "  - hyprlock, ffmpeg, inotify-tools"
+            echo "  - fish, fastfetch, btop, pulsemixer, wf-recorder, python3"
             ;;
     esac
 }
@@ -153,7 +155,6 @@ link_config() {
     local name="$3"
 
     if [ ! -e "$src" ]; then
-        warn "$name source not found: $src — skipping"
         return
     fi
 
@@ -305,8 +306,11 @@ link_dotfiles() {
     link_config "$DOTFILES_DIR/waybar/scripts/launch.sh" "$CONFIG_DIR/waybar/scripts/launch.sh" "waybar"
     link_config "$DOTFILES_DIR/waybar/scripts/media.sh" "$CONFIG_DIR/waybar/scripts/media.sh" "waybar"
     link_config "$DOTFILES_DIR/waybar/scripts/weather.sh" "$CONFIG_DIR/waybar/scripts/weather.sh" "waybar"
-    for s in brightness.sh notification.sh system-wifi.sh system-bluetooth.sh system-audio.sh system-cpu.sh system-memory.sh power-profile.sh power-profile-switch.sh system-power.sh workspaces.sh workspace-click.sh workspace-next.sh workspace-prev.sh tui-wifi.sh tui-bluetooth.sh tui-audio.sh tui-cpu.sh record-*.sh; do
+    for s in brightness.sh notification.sh system-wifi.sh system-bluetooth.sh system-audio.sh system-cpu.sh system-memory.sh power-profile.sh power-profile-switch.sh system-power.sh workspaces.sh workspace-click.sh workspace-next.sh workspace-prev.sh tui-wifi.sh tui-bluetooth.sh tui-audio.sh tui-cpu.sh; do
         link_config "$DOTFILES_DIR/waybar/scripts/$s" "$CONFIG_DIR/waybar/scripts/$s" "waybar"
+    done
+    for s in "$DOTFILES_DIR/scripts"/record*.sh; do
+        link_config "$s" "$CONFIG_DIR/waybar/scripts/$(basename "$s")" "waybar"
     done
 
     # Hyprland
@@ -351,6 +355,16 @@ link_dotfiles() {
     link_config "$DOTFILES_DIR/rofi/scripts/script_wallpaper.sh" "$CONFIG_DIR/rofi/scripts/script_wallpaper.sh" "rofi"
     link_config "$DOTFILES_DIR/rofi/scripts/system-power.sh" "$CONFIG_DIR/rofi/scripts/system-power.sh" "rofi"
     link_config "$DOTFILES_DIR/rofi/scripts/clipboard.sh" "$CONFIG_DIR/rofi/scripts/clipboard.sh" "rofi"
+
+    # Rofi icons (power menu + wallpaper selector)
+    link_config "$DOTFILES_DIR/icons/lock-outline-sharp.svg" "$CONFIG_DIR/rofi/icons/lock.svg" "rofi"
+    link_config "$DOTFILES_DIR/icons/logout-sharp.svg" "$CONFIG_DIR/rofi/icons/logout.svg" "rofi"
+    link_config "$DOTFILES_DIR/icons/sleep.svg" "$CONFIG_DIR/rofi/icons/sleep.svg" "rofi"
+    link_config "$DOTFILES_DIR/icons/reboot.svg" "$CONFIG_DIR/rofi/icons/reboot.svg" "rofi"
+    link_config "$DOTFILES_DIR/icons/shutdown.svg" "$CONFIG_DIR/rofi/icons/shutdown.svg" "rofi"
+    link_config "$DOTFILES_DIR/icons/cancel-outline.svg" "$CONFIG_DIR/rofi/icons/cancel.svg" "rofi"
+    link_config "$DOTFILES_DIR/icons/static.svg" "$CONFIG_DIR/rofi/icons/static.svg" "rofi"
+    link_config "$DOTFILES_DIR/icons/live.svg" "$CONFIG_DIR/rofi/icons/live.svg" "rofi"
 
     # Cava
     link_config "$DOTFILES_DIR/cava/config" "$CONFIG_DIR/cava/config" "cava"
@@ -411,7 +425,7 @@ add_keybind() {
 
 # ── Generate initial theme ──────────────────────────────────────
 generate_initial_theme() {
-    local initial_wall
+    local initial_wall=""
 
     for img in $(find "$WALL_DIR" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | sort); do
         if wallust run "$img" --config-dir "$CONFIG_DIR/wallust" -q 2>/dev/null; then
@@ -443,24 +457,6 @@ generate_initial_theme() {
     ok "Initial theme generated from $(basename "$initial_wall")"
 }
 
-# ── Set fish as default shell if installed ─────────────────────
-set_default_shell() {
-    if command -v fish &>/dev/null; then
-        local fish_path
-        fish_path=$(command -v fish)
-        if [ "$SHELL" != "$fish_path" ]; then
-            if chsh -s "$fish_path" 2>/dev/null; then
-                ok "Default shell set to fish ($fish_path)"
-            else
-                warn "Could not set fish as default shell (chsh failed)"
-                echo "  Run manually: chsh -s $fish_path"
-            fi
-        else
-            ok "Fish is already the default shell"
-        fi
-    fi
-}
-
 # ═══════════════════════════════════════════════════════════════
 # MAIN
 # ═══════════════════════════════════════════════════════════════
@@ -472,14 +468,11 @@ echo -e "${CYAN}╚════════════════════�
 echo ""
 
 # Parse args
-INSTALL_DEPS=false
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --with-deps) INSTALL_DEPS=true ;;
         --help|-h)
-            echo "Usage: $0 [--with-deps]"
+            echo "Usage: $0"
             echo ""
-            echo "  --with-deps    Automatically install system dependencies"
             echo "  --help         Show this help"
             exit 0
             ;;
@@ -487,13 +480,7 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-if [ "$INSTALL_DEPS" = true ]; then
-    install_deps
-else
-    warn "Skipping dependency installation (use --with-deps to auto-install)"
-    echo "  Required packages: wallust, waybar, swaync, wlogout, rofi, kitty"
-    echo "  Optional: awww (already installed), cava"
-fi
+install_deps
 
 setup_wallpapers
 setup_cache
@@ -505,7 +492,6 @@ make_executable
 setup_runcat
 fix_paths
 add_keybind
-set_default_shell
 generate_initial_theme
 
 # Install systemd user service for cache daemon
