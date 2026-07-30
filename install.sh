@@ -50,34 +50,27 @@ install_deps() {
                 power-profiles-daemon breeze inotify-tools fish fastfetch
                 brightnessctl bluez bluez-utils libnotify networkmanager
                 wireplumber pipewire-pulse curl jq imagemagick
-                nautilus wofi papirus-icon-theme wallust bluetui
+                nautilus wofi papirus-icon-theme rust
             )
-    local missing=()
-    sudo pacman -S --needed --noconfirm "${repo_pkgs[@]}" 2>&1 | \
-        grep -o "target not found: [^']*" | cut -d' ' -f4 > /tmp/missing_pkgs.txt || true
-    if [ -s /tmp/missing_pkgs.txt ]; then
-        mapfile -t missing < /tmp/missing_pkgs.txt
-    fi
-    rm -f /tmp/missing_pkgs.txt
-    missing+=(awww impala)
+            sudo pacman -S --needed --noconfirm "${repo_pkgs[@]}"
+            ok "Repo packages installed"
 
-    if command -v paru &>/dev/null; then
-        log "Installing via paru: ${missing[*]}"
-        paru -S --needed --noconfirm "${missing[@]}" || true
-    elif command -v yay &>/dev/null; then
-        yay -S --needed --noconfirm "${missing[@]}" || true
-    else
-        warn "No AUR helper found. Install manually:"
-        printf '  paru -S %s\n' "${missing[@]}"
-    fi
-            # Cargo fallback for wallust
-            if ! command -v wallust &>/dev/null; then
-                if command -v cargo &>/dev/null; then
-                    warn "Installing wallust via cargo..."
-                    cargo install wallust || true
-                else
-                    warn "wallust not installed — run: cargo install wallust"
-                fi
+            local aur_pkgs=(awww impala wallust bluetui)
+            if command -v paru &>/dev/null; then
+                log "Building AUR packages: ${aur_pkgs[*]}"
+                paru -S --needed --noconfirm "${aur_pkgs[@]}" 2>&1 || {
+                    warn "AUR build failed, retrying with --skip-checksum..."
+                    paru -S --needed --noconfirm --skip-checksum "${aur_pkgs[@]}" 2>&1 || true
+                }
+            elif command -v yay &>/dev/null; then
+                log "Building AUR packages: ${aur_pkgs[*]}"
+                yay -S --needed --noconfirm "${aur_pkgs[@]}" 2>&1 || {
+                    warn "AUR build failed, retrying with --skip-checksum..."
+                    yay -S --needed --noconfirm --skip-checksum "${aur_pkgs[@]}" 2>&1 || true
+                }
+            else
+                warn "No AUR helper found. Install manually:"
+                printf '  paru -S %s\n' "${aur_pkgs[@]}"
             fi
             ;;
         fedora)
@@ -91,13 +84,6 @@ install_deps() {
                 brightnessctl bluez libnotify \
                 NetworkManager wireplumber pipewire-pulseaudio \
                 curl jq ImageMagick nautilus wofi papirus-icon-theme
-            if ! command -v wallust &>/dev/null; then
-                if command -v cargo &>/dev/null; then
-                    cargo install wallust || true
-                else
-                    warn "wallust not installed — run: cargo install wallust"
-                fi
-            fi
             ;;
         debian)
             log "Installing packages (Debian/Ubuntu)..."
@@ -110,13 +96,6 @@ install_deps() {
                 brightnessctl bluez bluez-utils libnotify-bin \
                 network-manager wireplumber pipewire-pulse \
                 curl jq imagemagick nautilus wofi papirus-icon-theme
-            if ! command -v wallust &>/dev/null; then
-                if command -v cargo &>/dev/null; then
-                    cargo install wallust || true
-                else
-                    warn "wallust not installed — run: cargo install wallust"
-                fi
-            fi
             ;;
         nixos)
             log "NixOS detected — add these to your configuration.nix:"
@@ -436,22 +415,21 @@ install_systemd_services() {
 }
 
 install_cargo_tools() {
-    command -v cargo &>/dev/null || return 0
-    local installed=false
+    command -v cargo &>/dev/null || { warn "cargo not found, install rust to enable cargo-based tool installation"; return 0; }
 
     if ! command -v bluetui &>/dev/null; then
         log "Installing bluetui via cargo..."
-        cargo install bluetui 2>/dev/null && { ok "  bluetui installed"; installed=true; } || warn "  bluetui install failed"
+        cargo install bluetui && ok "  bluetui installed" || warn "  bluetui install failed"
     fi
 
     if ! command -v impala &>/dev/null; then
         log "Installing impala via cargo..."
-        cargo install impala 2>/dev/null && { ok "  impala installed"; installed=true; } || warn "  impala install failed"
+        cargo install impala && ok "  impala installed" || warn "  impala install failed"
     fi
 
     if ! command -v wallust &>/dev/null; then
         log "Installing wallust via cargo..."
-        cargo install wallust 2>/dev/null && { ok "  wallust installed"; installed=true; } || warn "  wallust install failed"
+        cargo install wallust && ok "  wallust installed" || warn "  wallust install failed"
     fi
 }
 
