@@ -42,8 +42,10 @@ install_deps() {
     case "$distro" in
         arch)
             log "Installing packages (Arch)..."
+
+            # Stage 1: guaranteed repo packages (core + extra) via pacman
             local repo_pkgs=(
-                waybar swaync wlogout rofi kitty cava
+                waybar swaync rofi kitty cava
                 hyprpicker wl-clipboard playerctl pavucontrol
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg
                 btop pulsemixer wf-recorder python
@@ -52,25 +54,22 @@ install_deps() {
                 wireplumber pipewire-pulse curl jq imagemagick
                 nautilus wofi papirus-icon-theme rust
             )
-            sudo pacman -S --needed --noconfirm "${repo_pkgs[@]}"
+            sudo pacman -S --needed --noconfirm "${repo_pkgs[@]}" || \
+                warn "Some repo packages failed — the rest were likely installed"
             ok "Repo packages installed"
 
-            local aur_pkgs=(awww impala wallust bluetui)
+            # Stage 2: packages that may be in community or AUR (wlogout, wallust, bluetui, awww, impala)
+            local extra_pkgs=(wlogout wallust bluetui awww impala)
             if command -v paru &>/dev/null; then
-                log "Building AUR packages: ${aur_pkgs[*]}"
-                paru -S --needed --noconfirm "${aur_pkgs[@]}" 2>&1 || {
-                    warn "AUR build failed, retrying with --skip-checksum..."
-                    paru -S --needed --noconfirm --skip-checksum "${aur_pkgs[@]}" 2>&1 || true
-                }
+                paru -S --needed --noconfirm "${extra_pkgs[@]}" || \
+                    warn "Some extra/AUR packages failed — install manually if needed"
+                ok "Extra/AUR packages installed"
             elif command -v yay &>/dev/null; then
-                log "Building AUR packages: ${aur_pkgs[*]}"
-                yay -S --needed --noconfirm "${aur_pkgs[@]}" 2>&1 || {
-                    warn "AUR build failed, retrying with --skip-checksum..."
-                    yay -S --needed --noconfirm --skip-checksum "${aur_pkgs[@]}" 2>&1 || true
-                }
+                yay -S --needed --noconfirm "${extra_pkgs[@]}" || \
+                    warn "Some extra/AUR packages failed — install manually if needed"
+                ok "Extra/AUR packages installed"
             else
-                warn "No AUR helper found. Install manually:"
-                printf '  paru -S %s\n' "${aur_pkgs[@]}"
+                warn "No AUR helper found. Install manually: paru -S ${extra_pkgs[*]}"
             fi
             ;;
         fedora)
@@ -409,8 +408,13 @@ install_systemd_services() {
 
     if command -v bluetoothctl &>/dev/null; then
         sudo rfkill unblock bluetooth 2>/dev/null || true
-        sudo systemctl enable --now bluetooth.service 2>/dev/null || true
-        ok "Bluetooth service enabled"
+        sudo systemctl daemon-reload 2>/dev/null || true
+        if systemctl list-unit-files bluetooth.service &>/dev/null; then
+            sudo systemctl enable --now bluetooth.service || warn "Could not enable bluetooth.service"
+            ok "Bluetooth service enabled"
+        else
+            warn "bluetooth.service unit not found — try reinstalling bluez"
+        fi
     fi
 }
 
@@ -580,10 +584,38 @@ add_keybind
 generate_initial_theme
 install_systemd_services
 
+# Add user to video group for backlight access
+if command -v brightnessctl &>/dev/null; then
+    if ! groups "$USER" | grep -q video; then
+        sudo usermod -aG video "$USER" 2>/dev/null || true
+        warn "Added $USER to 'video' group — log out and back in for brightnessctl to work"
+    fi
+fi
+
 install_cargo_tools
 verify_critical_tools
 verify_swaync_running
 verify_theme_outputs
+
+# Restart waybar and swaync to pick up new configs
+if pgrep -x waybar > /dev/null 2>&1; then
+    log "Restarting waybar..."
+    pkill -x waybar 2>/dev/null || true
+    sleep 0.3
+    waybar &>/dev/null &
+fi
+if pgrep -x swaync > /dev/null 2>&1; then
+    log "Reloading swaync config..."
+    swaync-client -R 2>/dev/null || true
+    swaync-client --reload-css 2>/dev/null || true
+fi
+
+# Start workspace monitor if Hyprland is running
+if pgrep -x Hyprland > /dev/null 2>&1; then
+    if ! pgrep -f workspace-monitor > /dev/null 2>&1; then
+        "$CONFIG_DIR/waybar/scripts/workspace-monitor.sh" &
+    fi
+fi
 
 echo ""
 echo -e "${GREEN}╔══════════════════════════════════╗${NC}"
