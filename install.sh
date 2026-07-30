@@ -52,24 +52,24 @@ install_deps() {
                 wireplumber pipewire-pulse curl jq imagemagick
                 nautilus wofi papirus-icon-theme wallust bluetui
             )
-            local missing=()
-            sudo pacman -S --needed --noconfirm "${repo_pkgs[@]}" 2>&1 | \
-                grep -o "target not found: [^']*" | cut -d' ' -f4 > /tmp/missing_pkgs.txt || true
-            if [ -s /tmp/missing_pkgs.txt ]; then
-                mapfile -t missing < /tmp/missing_pkgs.txt
-            fi
-            rm -f /tmp/missing_pkgs.txt
-            missing+=(awww impala)
+    local missing=()
+    sudo pacman -S --needed --noconfirm "${repo_pkgs[@]}" 2>&1 | \
+        grep -o "target not found: [^']*" | cut -d' ' -f4 > /tmp/missing_pkgs.txt || true
+    if [ -s /tmp/missing_pkgs.txt ]; then
+        mapfile -t missing < /tmp/missing_pkgs.txt
+    fi
+    rm -f /tmp/missing_pkgs.txt
+    missing+=(awww impala)
 
-            if command -v paru &>/dev/null; then
-                log "Installing via paru: ${missing[*]}"
-                paru -S --needed --noconfirm "${missing[@]}" || true
-            elif command -v yay &>/dev/null; then
-                yay -S --needed --noconfirm "${missing[@]}" || true
-            else
-                warn "No AUR helper found. Install manually:"
-                printf '  paru -S %s\n' "${missing[@]}"
-            fi
+    if command -v paru &>/dev/null; then
+        log "Installing via paru: ${missing[*]}"
+        paru -S --needed --noconfirm "${missing[@]}" || true
+    elif command -v yay &>/dev/null; then
+        yay -S --needed --noconfirm "${missing[@]}" || true
+    else
+        warn "No AUR helper found. Install manually:"
+        printf '  paru -S %s\n' "${missing[@]}"
+    fi
             # Cargo fallback for wallust
             if ! command -v wallust &>/dev/null; then
                 if command -v cargo &>/dev/null; then
@@ -263,6 +263,7 @@ install_waybar_config() {
     for s in "$DOTFILES_DIR/scripts"/record*.sh; do
         link_config "$s" "$CONFIG_DIR/waybar/scripts/$(basename "$s")" "waybar"
     done
+    link_config "$DOTFILES_DIR/scripts/workspace-monitor.sh" "$CONFIG_DIR/waybar/scripts/workspace-monitor.sh" "waybar"
 }
 
 install_hypr_config() {
@@ -409,6 +410,7 @@ install_systemd_services() {
     ok "wallust-cache-daemon service started"
 
     if command -v bluetoothctl &>/dev/null; then
+        sudo rfkill unblock bluetooth 2>/dev/null || true
         sudo systemctl enable --now bluetooth.service 2>/dev/null || true
         ok "Bluetooth service enabled"
     fi

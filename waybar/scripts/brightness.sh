@@ -2,7 +2,11 @@
 
 current=$(timeout 2 brightnessctl g 2>/dev/null)
 max=$(timeout 2 brightnessctl m 2>/dev/null)
-[ -z "$max" ] && max=255
+
+if [ -z "$current" ] || [ -z "$max" ] || [ "$max" -eq 0 ]; then
+    printf '{"text":" 󰃜 N/A","tooltip":"Brightness: N/A","class":""}\n'
+    exit 0
+fi
 
 pct=$(( current * 100 / max ))
 
