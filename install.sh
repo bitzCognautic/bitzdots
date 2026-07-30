@@ -59,19 +59,39 @@ install_deps() {
                 warn "Some repo packages failed — the rest were likely installed"
             ok "Repo packages installed"
 
-            # Stage 2: packages that may be in community or AUR (wlogout, wallust, bluetui, awww, impala)
-            local extra_pkgs=(wlogout wallust bluetui awww impala)
-            if command -v paru &>/dev/null; then
-                paru -S --needed --noconfirm "${extra_pkgs[@]}" || \
-                    warn "Some extra/AUR packages failed — install manually if needed"
-                ok "Extra/AUR packages installed"
-            elif command -v yay &>/dev/null; then
-                yay -S --needed --noconfirm "${extra_pkgs[@]}" || \
-                    warn "Some extra/AUR packages failed — install manually if needed"
-                ok "Extra/AUR packages installed"
-            else
-                warn "No AUR helper found. Install manually: paru -S ${extra_pkgs[*]}"
-            fi
+            # Stage 2: packages that may be in community or AUR
+            # Install individually so a single failure doesn't block the rest
+            install_aur_pkg() {
+                local pkg=$1
+                if command -v paru &>/dev/null; then
+                    paru -S --needed --noconfirm "$pkg" 2>&1 || return 1
+                elif command -v yay &>/dev/null; then
+                    yay -S --needed --noconfirm "$pkg" 2>&1 || return 1
+                else
+                    return 1
+                fi
+            }
+
+            for pkg in wlogout wallust bluetui awww impala; do
+                if command -v "$pkg" &>/dev/null; then
+                    continue
+                fi
+                log "Installing $pkg..."
+                if install_aur_pkg "$pkg"; then
+                    ok "  $pkg installed"
+                elif [ "$pkg" = wallust ] && command -v cargo &>/dev/null; then
+                    warn "  $pkg AUR build failed — trying cargo..."
+                    cargo install wallust && ok "  wallust installed via cargo" || warn "  wallust install failed"
+                elif [ "$pkg" = bluetui ] && command -v cargo &>/dev/null; then
+                    warn "  $pkg AUR build failed — trying cargo..."
+                    cargo install bluetui && ok "  bluetui installed via cargo" || warn "  bluetui install failed"
+                elif [ "$pkg" = impala ] && command -v cargo &>/dev/null; then
+                    warn "  $pkg AUR build failed — trying cargo..."
+                    cargo install impala && ok "  impala installed via cargo" || warn "  impala install failed"
+                else
+                    warn "  $pkg not installed — install manually if needed"
+                fi
+            done
             ;;
         fedora)
             log "Installing packages (Fedora)..."
@@ -127,6 +147,8 @@ install_deps() {
             echo "  - brightnessctl, bluez, bluez-utils, libnotify"
             echo "  - networkmanager, wireplumber, pipewire-pulse, curl, jq"
             echo "  - imagemagick, nautilus, wofi, papirus-icon-theme"
+            echo "  - chromium (dark mode policy will be created)"
+            echo "  - qt5ct, qt6ct, kvantum (for Qt dark theme)"
             ;;
     esac
 }
@@ -605,6 +627,28 @@ if command -v brightnessctl &>/dev/null; then
 fi
 
 install_cargo_tools
+
+# Force dark theme for GTK4 apps (Nautilus, etc.)
+if command -v gsettings &>/dev/null; then
+    gsettings set org.gnome.desktop.interface color-scheme prefer-dark 2>/dev/null || true
+fi
+
+# Force dark mode in Chromium/Chrome/Brave via managed policy
+browser_policies=(
+    "/etc/chromium/policies/managed/dark-mode.json"
+    "/etc/opt/chrome/policies/managed/dark-mode.json"
+    "/etc/brave/policies/managed/dark-mode.json"
+)
+policy_content='{"BrowserThemeColor": "#1e1e2e", "DarkModeAvailable": true, "DarkModeEnabled": true}'
+for policy_path in "${browser_policies[@]}"; do
+    policy_dir=$(dirname "$policy_path")
+    if [ ! -d "$policy_dir" ]; then
+        sudo mkdir -p "$policy_dir" 2>/dev/null || continue
+    fi
+    echo "$policy_content" | sudo tee "$policy_path" >/dev/null 2>&1 || true
+done
+log "Dark theme enforced for GTK4, Chromium, Chrome, Brave"
+
 verify_critical_tools
 verify_swaync_running
 verify_theme_outputs
