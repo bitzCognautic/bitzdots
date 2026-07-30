@@ -50,7 +50,8 @@ install_deps() {
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
                 impala bluetui btop pulsemixer wf-recorder python \
-                power-profiles-daemon breeze inotify-tools fish fastfetch wallust 2>&1 | \
+                power-profiles-daemon breeze inotify-tools fish fastfetch wallust \
+                brightnessctl bluez bluez-utils libnotify 2>&1 | \
                 grep -o "target not found: [^']*" | cut -d' ' -f4 > /tmp/missing_pkgs.txt || true
 
 
@@ -65,7 +66,7 @@ install_deps() {
                     aur_pkgs=("${aur_pkgs[@]/qt6ct/qt6ct-kde}")
                 fi
                 log "Installing AUR packages via paru: ${aur_pkgs[*]}"
-                paru -S --needed --noconfirm "${aur_pkgs[@]}"
+                paru -S --needed --noconfirm "${aur_pkgs[@]}" || true
             elif [ -s /tmp/missing_pkgs.txt ]; then
                 warn "paru not found. Install AUR packages manually:"
                 while IFS= read -r pkg; do
@@ -73,6 +74,16 @@ install_deps() {
                 done < /tmp/missing_pkgs.txt
             fi
             rm -f /tmp/missing_pkgs.txt
+            if ! command -v wallust &>/dev/null; then
+                if command -v cargo &>/dev/null; then
+                    warn "Installing wallust via cargo..."
+                    cargo install wallust
+                else
+                    warn "wallust not installed. Install manually:"
+                    echo "  cargo install wallust"
+                    echo "  (or paru -S wallust)"
+                fi
+            fi
             ;;
         fedora)
             log "Installing packages (Fedora)..."
@@ -81,7 +92,8 @@ install_deps() {
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
                 inotify-tools fish fastfetch btop pulsemixer \
-                wf-recorder python3 impala
+                wf-recorder python3 impala \
+                brightnessctl bluez libnotify
             if ! command -v wallust &>/dev/null; then
                 warn "wallust not in repos, installing via cargo..."
                 cargo install wallust
@@ -94,7 +106,8 @@ install_deps() {
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
                 inotify-tools fish fastfetch btop pulsemixer \
-                wf-recorder python3
+                wf-recorder python3 \
+                brightnessctl bluez bluez-utils libnotify-bin
             if ! command -v wallust &>/dev/null; then
                 warn "wallust not in repos, installing via cargo..."
                 cargo install wallust
@@ -110,6 +123,7 @@ install_deps() {
             echo "    hyprpicker wl-clipboard playerctl pavucontrol"
             echo "    polkit-kde-agent grim slurp cliphist hyprlock ffmpeg"
             echo "    fish fastfetch btop pulsemixer wf-recorder python3"
+            echo "    brightnessctl bluez bluez-utils libnotify"
             echo "  ];"
             ;;
         *)
@@ -120,6 +134,7 @@ install_deps() {
             echo "  - pavucontrol, polkit-kde-agent, grim, slurp, cliphist"
             echo "  - hyprlock, ffmpeg, inotify-tools"
             echo "  - fish, fastfetch, btop, pulsemixer, wf-recorder, python3"
+            echo "  - brightnessctl, bluez, bluez-utils, libnotify"
             ;;
     esac
 }
@@ -502,6 +517,12 @@ cp "$DOTFILES_DIR/systemd/user/wallust-cache-daemon.service" \
 systemctl --user daemon-reload 2>/dev/null || true
 systemctl --user enable --now wallust-cache-daemon.service 2>/dev/null || true
 ok "wallust-cache-daemon systemd service installed and started"
+
+# Enable bluetooth service if bluez is installed
+if command -v bluetoothctl &>/dev/null; then
+    sudo systemctl enable --now bluetooth.service 2>/dev/null || true
+    ok "Bluetooth service enabled"
+fi
 
 echo ""
 echo -e "${GREEN}╔══════════════════════════════════╗${NC}"
