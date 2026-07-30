@@ -75,6 +75,16 @@ Check that the module's dependencies are installed. For example, `custom/power-p
 
 Ensure `swaync` is running. Toggle with `SUPER+B` if it's hidden behind waybar.
 
+### xdg-desktop-portal-hyprland using 100% CPU
+
+Restart the portal service to fix the loop:
+
+```bash
+systemctl --user restart xdg-desktop-portal-hyprland
+```
+
+The install script does this automatically.
+
 ### Wallust colors not applying
 
 Make sure wallust is installed and templates are in `wallust/templates/`. Run `wallust run /path/to/wallpaper.jpg` manually.

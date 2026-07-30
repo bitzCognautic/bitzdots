@@ -236,6 +236,17 @@ ls -la ~/.config/rofi/theme-generated.rasi
 wallust run ~/.cache/current_wallpaper.png --config-dir ~/.config/wallust
 ```
 
+### High CPU usage from xdg-desktop-portal-hyprland
+
+`xdg-desktop-portal-hyprland` can enter a CPU loop (90%+) in version 1.4.x. This is a known upstream issue.
+
+```bash
+# Fix: restart the portal service
+systemctl --user restart xdg-desktop-portal-hyprland
+```
+
+The install script does this automatically at the end of installation.
+
 ### Inconsistencies after theme change
 
 ```bash

@@ -649,6 +649,12 @@ for policy_path in "${browser_policies[@]}"; do
 done
 log "Dark theme enforced for GTK4, Chromium, Chrome, Brave"
 
+# Restart xdg-desktop-portal-hyprland to prevent CPU loop (known 1.4.x issue)
+if systemctl --user is-active xdg-desktop-portal-hyprland &>/dev/null; then
+    systemctl --user restart xdg-desktop-portal-hyprland 2>/dev/null || true
+    ok "xdg-desktop-portal-hyprland restarted (fixes CPU loop)"
+fi
+
 verify_critical_tools
 verify_swaync_running
 verify_theme_outputs
