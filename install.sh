@@ -51,7 +51,9 @@ install_deps() {
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
                 impala bluetui btop pulsemixer wf-recorder python \
                 power-profiles-daemon breeze inotify-tools fish fastfetch wallust \
-                brightnessctl bluez bluez-utils libnotify 2>&1 | \
+                brightnessctl bluez bluez-utils libnotify networkmanager \
+                wireplumber pipewire-pulse curl jq imagemagick \
+                nautilus wofi papirus-icon-theme 2>&1 | \
                 grep -o "target not found: [^']*" | cut -d' ' -f4 > /tmp/missing_pkgs.txt || true
 
 
@@ -93,7 +95,9 @@ install_deps() {
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
                 inotify-tools fish fastfetch btop pulsemixer \
                 wf-recorder python3 impala \
-                brightnessctl bluez libnotify
+                brightnessctl bluez libnotify \
+                NetworkManager wireplumber pipewire-pulseaudio \
+                curl jq ImageMagick nautilus wofi papirus-icon-theme
             if ! command -v wallust &>/dev/null; then
                 warn "wallust not in repos, installing via cargo..."
                 cargo install wallust
@@ -107,7 +111,9 @@ install_deps() {
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
                 inotify-tools fish fastfetch btop pulsemixer \
                 wf-recorder python3 \
-                brightnessctl bluez bluez-utils libnotify-bin
+                brightnessctl bluez bluez-utils libnotify-bin \
+                network-manager wireplumber pipewire-pulse \
+                curl jq imagemagick nautilus wofi papirus-icon-theme
             if ! command -v wallust &>/dev/null; then
                 warn "wallust not in repos, installing via cargo..."
                 cargo install wallust
@@ -124,6 +130,8 @@ install_deps() {
             echo "    polkit-kde-agent grim slurp cliphist hyprlock ffmpeg"
             echo "    fish fastfetch btop pulsemixer wf-recorder python3"
             echo "    brightnessctl bluez bluez-utils libnotify"
+            echo "    networkmanager wireplumber pipewire-pulse"
+            echo "    curl jq imagemagick nautilus wofi papirus-icon-theme"
             echo "  ];"
             ;;
         *)
@@ -135,6 +143,8 @@ install_deps() {
             echo "  - hyprlock, ffmpeg, inotify-tools"
             echo "  - fish, fastfetch, btop, pulsemixer, wf-recorder, python3"
             echo "  - brightnessctl, bluez, bluez-utils, libnotify"
+            echo "  - networkmanager, wireplumber, pipewire-pulse, curl, jq"
+            echo "  - imagemagick, nautilus, wofi, papirus-icon-theme"
             ;;
     esac
 }

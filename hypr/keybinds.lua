@@ -9,8 +9,8 @@ hl.bind(S .. " + T", hl.dsp.exec_cmd("kitty"))
 -- Close active window
 hl.bind(S .. " + Q", hl.dsp.window.close())
 
--- File manager (Dolphin with wallust colors)
-hl.bind(S .. " + E", hl.dsp.exec_cmd("dolphin"))
+-- File manager (Nautilus)
+hl.bind(S .. " + E", hl.dsp.exec_cmd("nautilus"))
 
 -- Fullscreen
 hl.bind(S .. " + F", hl.dsp.window.fullscreen())
@@ -90,7 +90,7 @@ hl.bind(SC .. " + Q", hl.dsp.exit())
 hl.bind(SC .. " + F", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(S  .. " + H", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(SS .. " + space", hl.dsp.exec_cmd("wofi --show drun"))
-hl.bind(S  .. " + C",     hl.dsp.exec_cmd("code"))
+hl.bind(S  .. " + C",     hl.dsp.exec_cmd("chromium"))
 
 -- Wallpaper selector
 hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("~/.config/wallust/wallpaper-select.sh"))
