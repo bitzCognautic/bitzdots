@@ -6,7 +6,7 @@ How the automatic color theming pipeline works in bitzdots.
 
 ```
 Wallpaper image
-    ↓ wallust (kmeans algorithm, dark16 palette)
+    ↓ wallust (fastresize backend, dark16 palette)
 16-color palette (background, foreground, 8 accent colors, 8 terminal colors)
     ↓ 26 Jinja2 templates
 Config files for every component
@@ -18,7 +18,7 @@ All running apps pick up new colors
 
 ### 1. Color Extraction
 
-**wallust** analyzes your wallpaper image using the Kmeans clustering algorithm to extract a `dark16` palette — 16 colors that best represent the image:
+**wallust** analyzes your wallpaper image using the fastresize backend to extract a `dark16` palette — 16 colors that best represent the image:
 
 | Index | Usage |
 |-------|-------|

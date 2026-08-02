@@ -89,6 +89,15 @@ The install script does this automatically.
 
 Make sure wallust is installed and templates are in `wallust/templates/`. Run `wallust run /path/to/wallpaper.jpg` manually.
 
+### Wallust takes too long or fails with "Not enough colors!"
+
+The `kmeans` backend can take minutes and fail on some images. bitzdots uses the fast `fastresize` backend by default:
+
+```bash
+grep backend ~/.config/wallust/wallust.toml   # Should say "fastresize"
+wallust run image.jpg --config-dir ~/.config/wallust --backend fastresize
+```
+
 ### Fish greeter still shows
 
 Edit `fish/config.fish` and ensure `set -U fish_greeting` is present, then restart fish.

@@ -149,7 +149,7 @@ Optimization strategies are documented in **[Performance](docs/performance.md)**
 
 ```
 Wallpaper image
-    ↓ wallust (kmeans algorithm)
+    ↓ wallust (fastresize backend)
 16-color palette
     ↓ 26 Jinja2 templates
 Config files for every component

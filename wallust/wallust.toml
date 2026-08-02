@@ -1,4 +1,4 @@
-backend = "kmeans"
+backend = "fastresize"
 palette = "dark16"
 check_contrast = true
 

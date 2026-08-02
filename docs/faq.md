@@ -51,12 +51,24 @@ wallust run ~/.cache/current_wallpaper.png --config-dir ~/.config/wallust
 
 ### Colors look wrong on my wallpaper
 
-Some images give poor Kmeans extraction. Try:
+Some images give poor color extraction. Try:
 - Use a photo with more color variety
 - Convert to PNG
 - Manually adjust generated configs
 
 The cache daemon has a 24-hour cooldown for problematic images.
+
+### Theme generation fails or takes too long
+
+If `wallust run` takes over 30 seconds or errors with "Not enough colors!", the `kmeans` backend is struggling with the image. bitzdots defaults to the much faster `fastresize` backend (seconds, not minutes).
+
+```bash
+# Verify the backend is set
+grep backend ~/.config/wallust/wallust.toml   # Should say "fastresize"
+
+# Or force it for a one-off run
+wallust run ~/Pictures/Wallpapers/image.jpg --config-dir ~/.config/wallust --backend fastresize
+```
 
 ### Apps not using dark theme
 

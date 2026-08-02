@@ -404,7 +404,7 @@ generate_initial_theme() {
     local initial_wall=""
     local img
     for img in $(find "$WALL_DIR" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | sort); do
-        if wallust run "$img" --config-dir "$CONFIG_DIR/wallust" -q 2>/dev/null; then
+        if timeout 20 wallust run "$img" --config-dir "$CONFIG_DIR/wallust" -q 2>/dev/null; then
             initial_wall="$img"
             break
         fi
