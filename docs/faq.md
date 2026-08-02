@@ -5,7 +5,7 @@
 ### What makes bitzdots different from other Hyprland dotfiles?
 
 - **Low-end first** — Every component is optimized for minimal CPU and RAM usage
-- **Full-stack auto-theming** — 26 Jinja2 templates propagate wallpaper colors to 20+ components
+- **Full-stack auto-theming** — 25 Jinja2 templates propagate wallpaper colors to 20+ components
 - **Event-driven cache daemon** — Wallpaper cache pre-generates in background so switching is instant
 - **Safe by design** — Every theme generation backs up files and restores on failure
 - **No bloat** — Every script and dependency earns its place

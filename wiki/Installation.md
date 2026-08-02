@@ -30,7 +30,7 @@ The install script will:
 **Core:**
 - `hyprland` — Window manager
 - `waybar` — Status bar
-- `rofi-lbonn-wayland` — Launcher
+- `rofi` — Launcher
 - `swaync` — Notification center
 - `wallust` — Color generation from wallpapers
 - `fish` — Shell

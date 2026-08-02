@@ -4,7 +4,7 @@
 
 ### What is bitzdots?
 
-bitzdots is a collection of Hyprland dotfiles focused on low-end performance, automatic wallust theming, and a clean workflow. It includes configurations for waybar, rofi, swaync, fish, and 26 wallust templates.
+bitzdots is a collection of Hyprland dotfiles focused on low-end performance, automatic wallust theming, and a clean workflow. It includes configurations for waybar, rofi, swaync, fish, and 25 wallust templates.
 
 ### Is this for me?
 
@@ -13,7 +13,7 @@ If you want a performant, auto-themed Hyprland setup that runs well on older har
 ### How is this different from other dotfiles?
 
 - **Performance-first** — Every component is tuned for low CPU/RAM usage
-- **Auto-coloring pipeline** — 26 Jinja2 templates update automatically with any wallpaper
+- **Auto-coloring pipeline** — 25 Jinja2 templates update automatically with any wallpaper
 - **Comprehensive** — Recording, screenshots, media control, power management, notification center out of the box
 
 ## Installation
@@ -38,7 +38,7 @@ The install script is designed to drop files into `~/.config/`. Back up your exi
 wallust run /path/to/wallpaper.jpg
 ```
 
-This updates all 26 themed configs automatically.
+This updates all 25 themed configs automatically.
 
 ### How do I add a custom keybind?
 

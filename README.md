@@ -43,7 +43,7 @@ Built for **low-end hardware** without sacrificing usability. The full stack (Hy
 - **🎨 Full-stack auto-theming** — One wallpaper change propagates to 20+ components via wallust (waybar, kitty, rofi, swaync, wlogout, cava, Hyprland borders, Qt/KDE, GTK, even browser CSS)
 - **⚡ Event-driven cache daemon** — inotify-based background pre-generation means wallpaper switching is instant, not sluggish
 - **🖼 Live wallpaper support** — Static images with animated transitions (`awww`) and video wallpapers (`mpvpaper`) with automatic palette extraction
-- **🧩 26 Jinja2 templates** — Every themed component uses a template. Colors are consistent everywhere
+- **🧩 25 Jinja2 templates** — Every themed component uses a template. Colors are consistent everywhere
 - **🔧 Rofi-powered everything** — App launcher, clipboard manager (cliphist), power menu, wallpaper picker (grid with thumbnails), WiFi, Bluetooth, audio, system monitor — all keyboard-navigable
 - **🖥 Waybar with 10+ custom modules** — Workspace batch display, live media, recording indicator, brightness, power profiles, notification center toggle, system TUIs
 - **🔒 Full-screen + region recording** — wf-recorder with audio, start/stop toggle keybinds, saves to organized directories
@@ -116,7 +116,7 @@ Full reference: **[docs/keybindings.md](docs/keybindings.md)**
 ├── waybar/            # Status bar
 │   ├── config.jsonc   # Module layout (themed)
 │   ├── style.css      # Styling (themed)
-│   └── scripts/       # 24 custom scripts
+│   └── scripts/       # 17 custom scripts
 ├── rofi/              # App launcher & menus
 │   ├── themes/        # 24+ variants
 │   ├── scripts/       # Power, clipboard, wallpaper
@@ -125,7 +125,7 @@ Full reference: **[docs/keybindings.md](docs/keybindings.md)**
 ├── wlogout/           # Logout screen
 ├── kitty/             # Terminal (themed)
 ├── cava/              # Audio visualizer (themed)
-├── wallust/           # Theming engine (26 templates)
+├── wallust/           # Theming engine (25 templates)
 ├── fish/              # Fish shell config
 ├── fastfetch/         # System fetch (custom logo)
 └── scripts/           # 8 utility scripts
@@ -151,7 +151,7 @@ Optimization strategies are documented in **[Performance](docs/performance.md)**
 Wallpaper image
     ↓ wallust (fastresize backend)
 16-color palette
-    ↓ 26 Jinja2 templates
+    ↓ 25 Jinja2 templates
 Config files for every component
     ↓ reload-theme.sh
 All apps pick up new colors instantly

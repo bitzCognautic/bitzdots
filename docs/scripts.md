@@ -4,34 +4,26 @@ Reference for all scripts in bitzdots.
 
 ## Waybar Scripts (`waybar/scripts/`)
 
-24 scripts powering the waybar custom modules.
+17 scripts powering the waybar custom modules.
 
 | Script | Purpose | Used By |
 |--------|---------|---------|
 | `brightness.sh` | Outputs current brightness % with 4-tier icon as JSON | `custom/brightness` |
 | `launch.sh` | Ensures waybar + swaync are running | Autostart |
 | `media.sh` | playerctl metadata follower (artist/title/album/status) | `custom/media` |
-| `media-control.sh` | JSON output for prev/next buttons | Media controls |
 | `notification.sh` | Bell icon with DnD/notification count | `custom/notification` |
 | `power-profile.sh` | Queries UPower via D-Bus for active profile icon | `custom/power-profiles` |
 | `power-profile-switch.sh` | Cycles to next available power profile via D-Bus | Click handler |
 | `system-power.sh` | Rofi power menu (Lock/Logout/Sleep/Reboot/Shutdown) | `custom/power` |
-| `system-audio.sh` | Rofi audio device switcher | PulseAudio click |
-| `system-bluetooth.sh` | Rofi bluetooth manager | Bluetooth click |
-| `system-wifi.sh` | Rofi WiFi network selector | Network click |
-| `system-cpu.sh` | Rofi system monitor launcher | CPU click |
-| `system-memory.sh` | Shows `free -h` output | Memory click |
 | `tui-audio.sh` | Opens pulsemixer in floating kitty | Audio click (waybar) |
 | `tui-bluetooth.sh` | Opens bluetui in floating kitty | Bluetooth click (waybar) |
 | `tui-wifi.sh` | Opens impala in floating kitty | Network click (waybar) |
 | `tui-cpu.sh` | Opens btop in floating kitty | CPU click (waybar) |
-| `tui-launch.sh` | Generic TUI launcher with fallback | Internal |
 | `weather.sh` | Fetches weather from wttr.in (30-min cache) | Optional module |
 | `workspaces.sh` | Batch workspace display (5 at a time) | `custom/workspaces` |
 | `workspace-click.sh` | Determines clicked workspace from pixel offset | Workspace click |
 | `workspace-next.sh` | Focus next workspace | Scroll up |
 | `workspace-prev.sh` | Focus previous workspace | Scroll down |
-| `workspace-names.sh` | Daemon for workspace name formatting | (standalone) |
 
 ## Utility Scripts (`scripts/`)
 

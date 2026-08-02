@@ -37,7 +37,7 @@ All configuration files live under `~/.config/`:
 │   ├── config.jsonc          # Waybar module configuration
 │   └── style.css             # Waybar styling
 └── wallust/
-    └── templates/            # Jinja2 templates (26 files)
+    └── templates/            # Jinja2 templates (25 files)
 ```
 
 ## Hyprland

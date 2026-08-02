@@ -9,7 +9,7 @@ The core feature. Every component derives its colors from your current wallpaper
 ### How It Works
 
 1. **wallust** extracts a 16-color palette from your wallpaper using the fastresize backend (fast and reliable on low-end hardware)
-2. **26 Jinja2 templates** render these colors into config files
+2. **25 Jinja2 templates** render these colors into config files
 3. **reload-theme.sh** notifies all running applications of the change
 4. **Cache daemon** pre-generates palettes so switching wallpapers is instant
 

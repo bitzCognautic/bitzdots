@@ -12,7 +12,7 @@ chmod +x ~/.config/scripts/install.sh
 
 ## Key Features
 
-- **Auto-coloring** — Pick any wallpaper; wallust generates 26 themed templates automatically across all apps
+- **Auto-coloring** — Pick any wallpaper; wallust generates 25 themed templates automatically across all apps
 - **Low-end optimized** — CPU idle: ~3.5%, RAM: ~1.2GB (includes browser + editor)
 - **Rofi launchers** — App launcher, clipboard manager, emoji picker, network menu, power menu
 - **Waybar with 14 modules** — Workspaces, clock, CPU, memory, network, recording indicator, power profiles, brightness, notifications, tray, custom scripts
@@ -30,7 +30,7 @@ chmod +x ~/.config/scripts/install.sh
 ├── scripts/           # Custom scripts (recording, media, power, etc.)
 ├── swaync/            # Notification center config
 ├── waybar/            # Waybar bar configs and styles
-├── wallust/           # Wallust templates (26 Jinja2 templates)
+├── wallust/           # Wallust templates (25 Jinja2 templates)
 └── docs/              # Documentation
 ```
 

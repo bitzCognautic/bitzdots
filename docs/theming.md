@@ -8,7 +8,7 @@ How the automatic color theming pipeline works in bitzdots.
 Wallpaper image
     ↓ wallust (fastresize backend, dark16 palette)
 16-color palette (background, foreground, 8 accent colors, 8 terminal colors)
-    ↓ 26 Jinja2 templates
+    ↓ 25 Jinja2 templates
 Config files for every component
     ↓ reload-theme.sh
 All running apps pick up new colors
@@ -31,7 +31,7 @@ Contrast checking is enabled — wallust ensures text remains readable.
 
 ### 2. Template Rendering
 
-26 Jinja2 templates in `wallust/templates/` use wallust color variables:
+25 Jinja2 templates in `wallust/templates/` use wallust color variables:
 
 ```jinja2
 {{background}}       → #1a1218
@@ -88,7 +88,7 @@ This means a bad wallpaper or failed wallust run never breaks your theme.
 
 ## Template Reference
 
-All 26 templates in `wallust/templates/`:
+All 25 templates in `wallust/templates/`:
 
 | Template | Target | Purpose |
 |---|---|---|
@@ -117,7 +117,6 @@ All 26 templates in `wallust/templates/`:
 | `cancel.svg.j2` | `rofi/icons/cancel.svg` | Cancel icon |
 | `static.svg.j2` | `rofi/icons/static.svg` | Static wallpaper icon |
 | `live.svg.j2` | `rofi/icons/live.svg` | Live wallpaper icon |
-| `eww.scss.j2` | (experimental) | Eww styling |
 
 ## Adding a New Themed Component
 

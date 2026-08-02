@@ -13,7 +13,7 @@ wallust run wallpaper.jpg
       ↓
 Generates 16-color palette
       ↓
-26 Jinja2 templates processed
+25 Jinja2 templates processed
       ↓
 Templates written to:
   ├── waybar/style.css
@@ -23,7 +23,7 @@ Templates written to:
   └── 22 other config files
 ```
 
-### 26 Templates
+### 25 Templates
 
 The `wallust/templates/` directory contains Jinja2 templates for every themed component:
 
@@ -33,7 +33,7 @@ The `wallust/templates/` directory contains Jinja2 templates for every themed co
 | 2 | `swaync-style` | `swaync/style.css` | Notification center |
 | 3-8 | `rofi-*` | `rofi/*.rasi` | Launcher styles |
 | 9 | `hypr-appearance` | `hypr/appearance.lua` | Window decorations |
-| 10-26 | Various | Various | Other themed files |
+| 10-25 | Various | Various | Other themed files |
 
 ### Changing Theme
 
@@ -43,7 +43,7 @@ Simply run:
 wallust run /path/to/new-wallpaper.jpg
 ```
 
-All 26 templates are re-processed automatically. Changes take effect immediately for most components (some may need a reload).
+All 25 templates are re-processed automatically. Changes take effect immediately for most components (some may need a reload).
 
 ### Templates
 
