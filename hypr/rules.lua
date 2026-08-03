@@ -35,14 +35,6 @@ hl.window_rule({
 })
 
 hl.window_rule({
-    name   = "float-nautilus",
-    match  = { class = "^org.gnome.Nautilus$" },
-    float  = true,
-    center = true,
-    size   = { 800, 600 },
-})
-
-hl.window_rule({
     name  = "float-xdg-portal",
     match = { class = "^xdg-desktop-portal-gtk$" },
     float = true,
