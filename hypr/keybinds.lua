@@ -68,8 +68,8 @@ hl.bind(SS .. " + T", hl.dsp.exec_cmd("~/.local/bin/eink-ocr"))
 -- Print screen: full screenshot
 hl.bind("Print", hl.dsp.exec_cmd("f=~/Pictures/Screenshots/Fullscreen/screenshot_$(date +%Y-%m-%d_%H-%M-%S).png; grim \"$f\" && wl-copy < \"$f\" && notify-send 'Screenshot' 'Saved & Copied' || notify-send -u critical 'Screenshot' 'Failed'"))
 
--- Color picker
-hl.bind(SC .. " + C", hl.dsp.exec_cmd("hyprpicker -a && wl-copy && notify-send \"Color picked\" \"$(wl-paste)\""))
+-- Color picker (copies hex to clipboard)
+hl.bind(SS .. " + C", hl.dsp.exec_cmd("hyprpicker -a && notify-send \"Color picked\" \"$(wl-paste)\""))
 
 -- Notifications
 hl.bind(S .. " + N", hl.dsp.exec_cmd("swaync-client -t"))
