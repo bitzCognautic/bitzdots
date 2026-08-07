@@ -5,59 +5,78 @@
 ## Quick Start
 
 ```bash
-git clone https://github.com/bitzzdev/bitzdots.git ~/.config
-chmod +x ~/.config/scripts/install.sh
-~/.config/scripts/install.sh
+git clone https://github.com/bitzzdev/bitzdots.git ~/.config/bitzdots
+cd ~/.config/bitzdots
+chmod +x install.sh
+
+# Link configs only:
+./install.sh
+
+# Or link configs + install all system packages:
+./install.sh --with-deps
 ```
 
 ## Key Features
 
 - **Auto-coloring** — Pick any wallpaper; wallust generates 25 themed templates automatically across all apps
-- **Low-end optimized** — CPU idle: ~3.5%, RAM: ~1.2GB (includes browser + editor)
-- **Rofi launchers** — App launcher, clipboard manager, emoji picker, network menu, power menu
-- **Waybar with 14 modules** — Workspaces, clock, CPU, memory, network, recording indicator, power profiles, brightness, notifications, tray, custom scripts
+- **Low-end optimized** — Full desktop stack (Hyprland + waybar + swaync) idles under 300MB RAM
+- **Rofi launchers** — App launcher, clipboard manager, power menu, wallpaper picker (grid with thumbnails)
+- **Waybar with 15 modules** — Workspaces, runcat, media, clock, CPU, memory, network, bluetooth, recording indicator, power profiles, brightness, notifications, tray, power
 - **Screenshot & recording** — Fullscreen and region screenshot (with `wl-copy` clipboard), fullscreen and region recording (with `wf-recorder`)
 - **Fish + fastfetch** — Custom BITZ ASCII logo, clean terminal experience
+- **Live wallpaper support** — Video wallpapers via `mpvpaper` with automatic palette extraction
+- **55+ keybindings** — Fully keyboard-driven, including a resize submode
 
 ## Directory Structure
 
 ```
-~/.config/
+~/.config/bitzdots/
+├── hypr/              # Hyprland config (9 Lua modules)
+├── waybar/            # Bar config, styles, 17 scripts
+├── rofi/              # Launcher config, 27 themes, 8 icons, scripts
+├── swaync/            # Notification center
+├── wlogout/           # Logout screen
+├── kitty/             # Terminal config
+├── cava/              # Audio visualizer
+├── wallust/           # Theming engine (25 Jinja2 templates)
 ├── fish/              # Fish shell config
 ├── fastfetch/         # Fastfetch config with BITZ logo
-├── hypr/              # Hyprland config (keybinds, rules, appearance, monitors)
-├── rofi/              # Rofi launcher configs
-├── scripts/           # Custom scripts (recording, media, power, etc.)
-├── swaync/            # Notification center config
-├── waybar/            # Waybar bar configs and styles
-├── wallust/           # Wallust templates (25 Jinja2 templates)
-└── docs/              # Documentation
+├── scripts/           # 10 utility scripts
+├── icons/             # Source SVG icons (linked to rofi)
+├── environment.d/     # Qt environment variables
+├── gtk/               # GTK3/4 dark theme settings
+└── systemd/           # User services (wallust cache daemon)
 ```
 
 ## Performance
 
 | Metric | Value |
 |--------|-------|
-| CPU idle | ~3.5% |
-| RAM usage | ~1.2GB (with apps) |
-| Waybar CPU | ~3.5% |
+| Idle RAM (full stack) | ~250-300MB |
+| Waybar CPU | ~3.5% idle |
+| Hyprland RAM | ~170MB |
+| swaync RAM | ~85MB |
 | Polling intervals | max 30s |
-| Blur size | 5 |
+| Cache daemon priority | Nice=19, idle IO |
 
 ## Keybinds
 
 | Key | Action |
 |-----|--------|
-| `SUPER`+`Return` | Terminal |
-| `SUPER`+`Space` | App launcher |
+| `SUPER`+`T` | Terminal (kitty) |
+| `SUPER`+`Space` | App launcher (rofi) |
 | `SUPER`+`Q` | Close window |
 | `SUPER`+`R` | Start fullscreen recording |
 | `SUPER`+`SHIFT`+`R` | Start region recording |
 | `SUPER`+`S` | Stop recording |
 | `Print` | Full screenshot |
 | `SUPER`+`SHIFT`+`S` | Selection screenshot |
-| `SUPER`+`B` | Toggle bar |
-| `SUPER`+`M` | Media controls |
+| `SUPER`+`SHIFT`+`W` | Wallpaper picker |
+| `SUPER`+`N` | Toggle notifications |
+| `SUPER`+`P` | Power menu |
+| `SUPER`+`L` | Lock screen |
+
+See the full [Keybindings](Keybindings) reference for all 55+ binds.
 
 ## Links
 

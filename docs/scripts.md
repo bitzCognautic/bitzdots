@@ -27,7 +27,7 @@ Reference for all scripts in bitzdots.
 
 ## Utility Scripts (`scripts/`)
 
-8 core scripts for theming and recording.
+10 core scripts for theming and recording.
 
 ### `reload-theme.sh`
 

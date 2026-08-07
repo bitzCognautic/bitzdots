@@ -1,53 +1,79 @@
 # Configuration
 
+All configuration files live under `~/.config/` and are symlinked from the repo by `install.sh`.
+
 ## File Structure
 
-All configuration files live under `~/.config/`:
-
 ```
-~/.config/
+~/.config/bitzdots/
+├── hypr/                    # Hyprland (Lua)
+│   ├── hyprland.lua         # Entry point (requires all modules)
+│   ├── variables.lua        # Environment variables
+│   ├── monitors.lua         # Display configuration
+│   ├── input.lua            # Keyboard, mouse, touchpad
+│   ├── appearance.lua       # Blur, opacity, borders
+│   ├── animations.lua       # Window animations
+│   ├── keybinds.lua         # 55+ keyboard shortcuts
+│   ├── rules.lua            # Window rules
+│   └── autostart.lua        # Startup applications
+├── waybar/
+│   ├── config.jsonc         # Module layout (15 modules, themed)
+│   ├── style.css            # Bar styling (themed)
+│   ├── colors/teto.css      # Default color fallback
+│   ├── scripts/             # 17 custom scripts
+│   └── modules/runcat-text/ # CPU runcat animation
+├── rofi/
+│   ├── config.rasi          # Main config
+│   ├── themes/              # 27 theme variants
+│   ├── colors/              # 16 static color schemes
+│   ├── launchers/type-6/    # Wallpaper launcher variant
+│   ├── scripts/             # Power, clipboard, wallpaper scripts
+│   └── icons/               # 8 themed SVG icons
+├── swaync/
+│   ├── config.json          # Notification center config
+│   └── style.css            # Notification styles (themed)
+├── wlogout/
+│   ├── layout               # Button layout
+│   ├── style.css            # Logout screen styles (themed)
+│   ├── assets/              # SVG icons
+│   └── icons/               # PNG icons
+├── kitty/
+│   └── kitty.conf           # Terminal config
+├── cava/
+│   ├── config               # Audio visualizer config
+│   ├── shaders/             # 6 shaders
+│   └── themes/generated     # Auto-generated theme
+├── wallust/
+│   ├── wallust.toml         # Theming config (template → target map)
+│   ├── templates/           # 25 Jinja2 templates
+│   └── *.sh                 # Utility scripts (linked from scripts/)
 ├── fish/
 │   └── config.fish          # Shell configuration
 ├── fastfetch/
-│   ├── config.jsonc          # Fastfetch config
-│   └── bitz.txt              # Custom BITZ ASCII logo
-├── hypr/
-│   ├── keybinds.lua          # Keyboard shortcuts
-│   ├── rules.lua             # Window rules
-│   ├── appearance.lua        # Theme settings
-│   ├── monitors.lua          # Display configuration
-│   └── hyprland.conf         # Main entry point
-├── rofi/
-│   ├── app-launcher.rasi     # App launcher style
-│   ├── clipboard.rasi        # Clipboard style
-│   ├── emoji.rasi            # Emoji picker style
-│   └── powermenu.rasi        # Power menu style
-├── scripts/
-│   ├── record-fullscreen.sh  # Fullscreen recording
-│   ├── record-region.sh      # Region recording
-│   ├── recording-indicator.sh # Waybar recording icon
-│   ├── media.sh              # Media player controls
-│   ├── power-profile.sh      # Power profile display
-│   ├── power-profile-switch.sh # Power profile toggle
-│   └── screenshot.sh         # Screenshot utility
-├── swaync/
-│   ├── config.json           # Notification center config
-│   └── style.css             # Notification styles
-├── waybar/
-│   ├── config.jsonc          # Waybar module configuration
-│   └── style.css             # Waybar styling
-└── wallust/
-    └── templates/            # Jinja2 templates (25 files)
+│   ├── config.jsonc         # Fastfetch config
+│   └── bitz.txt             # Custom BITZ ASCII logo
+├── scripts/                 # 10 utility scripts
+├── icons/                   # Source SVG icons (linked to rofi)
+├── gtk/                     # GTK3/4 dark theme settings
+├── environment.d/qt.conf    # Qt environment variables
+└── systemd/user/            # User services (wallust cache daemon)
 ```
 
 ## Hyprland
 
 Hyprland configuration is split into modular Lua files for maintainability:
 
-- `hypr/keybinds.lua` — All keyboard shortcuts
-- `hypr/rules.lua` — Per-window rules (floating, workspace assignments, opacity)
-- `hypr/appearance.lua` — Blur, animations, gaps, border settings
-- `hypr/monitors.lua` — Display resolution, refresh rate, orientation
+| File | Purpose |
+|------|---------|
+| `hyprland.lua` | Entry point — requires all other modules |
+| `variables.lua` | Sets `XCURSOR_SIZE`, `XCURSOR_THEME`, Qt overrides |
+| `monitors.lua` | Display resolution, refresh rate, orientation |
+| `input.lua` | Keyboard, mouse, touchpad settings |
+| `appearance.lua` | Blur, gaps, border colors (active border uses theme) |
+| `animations.lua` | Window open/close animations |
+| `keybinds.lua` | All keyboard shortcuts (55+) |
+| `rules.lua` | Per-window rules (floating, workspace, opacity) |
+| `autostart.lua` | Starts waybar, swaync, polkit, cliphist, wallpaper daemon |
 
 ## Waybar
 
@@ -55,21 +81,22 @@ Waybar modules are configured in `waybar/config.jsonc` with these intervals:
 
 | Module | Interval | Notes |
 |--------|----------|-------|
-| Workspaces | 3s | Uses `hyprctl workspaces -j` |
+| Workspaces | 2s | Uses `hyprctl workspaces -j` |
+| Runcat | on-event | CPU activity animation (Python) |
+| Media | on-event | playerctl now-playing |
 | CPU | 5s | Lightweight polling |
 | Memory | 10s | RAM usage display |
-| Network | 10s | Wi-Fi status |
-| Recording | 10s | Blinks `` when active |
+| Network | 3s | Wi-Fi/ethernet status |
+| Recording | 10s | Blinks when wf-recorder active |
 | Clock | 30s | Date and time |
-| Power profiles | 30s | UPower D-Bus |
+| Power profiles | 5s | UPower D-Bus |
 | Brightness | 5s | Backlight control |
 | Notifications | 10s | SwayNC integration |
 
 ## Scripts
 
-All scripts are in `scripts/` and follow these conventions:
+All utility scripts live in `scripts/` and are symlinked into `~/.config/wallust/`. Waybar-specific scripts live in `waybar/scripts/`. See [Scripts](Scripts) for details.
 
-- **Debounce mechanism** — Atomic `mkdir` to prevent double-firing (Hyprland sometimes fires keybinds twice)
-- **Cross-type guards** — `pgrep -x wf-recorder` prevents overlapping recording types
-- **Foreground execution** — Scripts run in foreground (no `&`/`wait`)
-- **Notifications** — All actions send desktop notifications
+## Auto-Generated Files
+
+Files marked `Auto-generated by wallust — DO NOT EDIT` are regenerated on every wallpaper change. To customize them permanently, edit the corresponding Jinja2 template in `wallust/templates/` instead. See [Customization](Customization).

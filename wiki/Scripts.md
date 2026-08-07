@@ -1,79 +1,172 @@
 # Scripts
 
-All custom scripts are in `~/.config/scripts/`.
+All custom scripts. Utility scripts live in `scripts/` and are symlinked into `~/.config/wallust/`. Waybar scripts live in `waybar/scripts/`.
 
-## Recording Scripts
+## Utility Scripts (`scripts/` → `~/.config/wallust/`)
+
+10 core scripts for theming and recording.
+
+### `wallpaper-select.sh`
+
+Rofi-based wallpaper picker with grid thumbnails.
+
+```bash
+~/.config/wallust/wallpaper-select.sh                    # Open picker UI
+~/.config/wallust/wallpaper-select.sh /path/to/image.jpg  # Direct set
+~/.config/wallust/wallpaper-select.sh --live              # Live picker only
+```
+
+**Features:**
+- Main menu with Static / Live wallpaper options (themed SVG icons)
+- Grid display with thumbnails (static) and ffmpeg-generated thumbnails (live)
+- Cached theme switching — uses pre-generated palettes when available
+- Backup/restore safety on all theme generations
+- Restarts waybar after theme change
+- **Bound to**: `SUPER + SHIFT + W`
+
+### `reload-theme.sh`
+
+Applies the generated theme to all running components without killing apps.
+
+```bash
+~/.config/wallust/reload-theme.sh
+```
+
+**What it does:**
+1. Sources color env vars from `wallust/env`
+2. Fixes `~` expansion in `qt6ct/qt6ct.conf`
+3. Reloads swaync CSS in-place (`swaync-client --reload-css`)
+4. Updates Hyprland border colors live via `hyprctl eval`
+
+### `cache-wallpapers.sh`
+
+One-shot pre-cache of all wallpapers.
+
+```bash
+~/.config/wallust/cache-wallpapers.sh
+```
+
+Generates wallust palettes and thumbnails for every static and live wallpaper in the directories.
+
+### `wallust-cache-daemon.sh`
+
+Event-driven background cache daemon (run by systemd).
+
+```bash
+systemctl --user status wallust-cache-daemon.service
+```
+
+- Watches wallpaper directories with `inotifywait`
+- Debounces rapid file changes
+- Pre-generates palettes in background (Nice=19, idle IO)
+- 24-hour failure cooldown for problematic images
+- File locking for single-instance safety
 
 ### `record-fullscreen.sh`
 
-Starts fullscreen screen recording with audio from the default sink monitor.
+Toggle fullscreen screen recording.
 
-- **Trigger**: `SUPER+R`
+- **Trigger**: `SUPER + R`
 - **Output**: `~/Videos/Recordings/Fullscreen/recording_YYYYMMDD_HHMMSS.mp4`
-- **Audio**: Internal desktop audio only (no microphone)
+- **Audio**: Desktop audio (default sink monitor)
 - **Guard**: Atomic `mkdir` debounce + `pgrep -x wf-recorder` cross-type guard
-- **Details**: Sets monitor volume to 100%, saves with notification
+- **Notifications**: Shows start/stop notifications
 
 ### `record-region.sh`
 
-Starts region screen recording with audio.
+Toggle region screen recording.
 
-- **Trigger**: `SUPER+SHIFT+R`
+- **Trigger**: `SUPER + SHIFT + R`
 - **Selection**: `slurp` — click and drag to select area
 - **Output**: `~/Videos/Recordings/Region/recording_YYYYMMDD_HHMMSS.mp4`
-- **Audio**: Internal desktop audio only
+- **Audio**: Desktop audio only
 - **Guard**: Same as fullscreen script
 
 ### `recording-indicator.sh`
 
-Waybar custom module that blinks `` when recording is active.
+Waybar module that blinks when recording is active.
 
 - **Trigger**: Polled by waybar every 10s
 - **Mechanism**: Checks `pgrep -x wf-recorder`
 - **Output**: Waybar JSON with text and CSS class
 
-**Note on Hydra/SuperHypr**: If you use the Hydra tool from SuperHypr, its recording script also uses `wf-recorder` and has the same atomic `mkdir` debounce mechanism.
+### `hyprlock-setup.sh`
 
-## Utility Scripts
-
-### `media.sh`
-
-Media player controls for `playerctl`.
-
-- Shows current track in waybar
-- Displays album art in SwayNC notifications
-- **Lightweight**: Kills any lingering `playerctl metadata --follow` on startup
-
-### `power-profile.sh`
-
-Displays current power profile in waybar.
-
-- Uses `busctl` directly on UPower D-Bus (no `powerprofilesctl` which can hang)
-- Instant results with no CPU spikes
-
-### `power-profile-switch.sh`
-
-Cycles through power profiles: performance → balanced → power-saver.
-
-- On-click action for waybar
-- Sends notification on profile change
-
-### `screenshot.sh`
-
-Handles fullscreen and region screenshots.
-
-- **Full**: `grim` → `~/Pictures/Screenshots/Fullscreen/` + `wl-copy` clipboard
-- **Region**: `grim -g "$(slurp)"` → `~/Pictures/Screenshots/Freeform/` + clipboard
-- Sends notification with file path
-
-## Debounce Mechanism
-
-All Hyprland-triggered scripts use atomic `mkdir` for debounce:
+Generates a basic `hyprlock.conf` from the current wallpaper.
 
 ```bash
-DEBOUNCE_DIR="/tmp/script-name.debounce"
-if ! mkdir "$DEBOUNCE_DIR" 2>/dev/null; then exit 0; fi
-trap "rmdir '$DEBOUNCE_DIR'" EXIT
+~/.config/wallust/hyprlock-setup.sh
 ```
 
-This prevents double-firing from Hyprland which can trigger keybinds twice per press.
+- Uses current wallpaper as lock screen background
+- Sets JetBrainsMono font for clock/date
+
+### `workspace-monitor.sh`
+
+Background helper that pushes instant waybar workspace updates on Hyprland workspace events (used by autostart).
+
+### `hyprlogout`
+
+Wrapper used by the power menu / wlogout to exit Hyprland cleanly.
+
+## Waybar Scripts (`waybar/scripts/`)
+
+17 scripts powering the waybar custom modules:
+
+| Script | Purpose |
+|--------|---------|
+| `brightness.sh` | Current brightness % with 4-tier icon (JSON) |
+| `brightness-adjust.sh` | Adjust brightness up/down (scroll handler) |
+| `launch.sh` | Ensures waybar + swaync are running |
+| `media.sh` | playerctl metadata follower (artist/title/status) |
+| `notification.sh` | Bell icon with DnD/notification count |
+| `power-profile.sh` | Active UPower power profile (D-Bus) |
+| `power-profile-switch.sh` | Cycle to next power profile |
+| `system-power.sh` | Rofi power menu (Lock/Logout/Sleep/Reboot/Shutdown) |
+| `tui-audio.sh` | Opens pulsemixer in floating kitty |
+| `tui-bluetooth.sh` | Opens bluetui in floating kitty |
+| `tui-wifi.sh` | Opens impala in floating kitty |
+| `tui-cpu.sh` | Opens btop in floating kitty |
+| `weather.sh` | Weather from wttr.in (30-min cache) |
+| `workspaces.sh` | Batch workspace display (5 at a time) |
+| `workspace-click.sh` | Focus clicked workspace (pixel offset) |
+| `workspace-next.sh` | Focus next workspace |
+| `workspace-prev.sh` | Focus previous workspace |
+
+## Rofi Scripts (`rofi/scripts/`)
+
+### `system-power.sh`
+
+Power management menu with themed SVG icons.
+
+```bash
+~/.config/rofi/scripts/system-power.sh
+```
+
+Options: **Lock** (hyprlock), **Logout** (hyprlogout), **Sleep** (systemctl suspend), **Reboot** (systemctl reboot), **Shutdown** (systemctl poweroff), **Cancel**.
+
+- **Bound to**: `SUPER + P`
+
+### `clipboard.sh`
+
+Clipboard history manager.
+
+```bash
+~/.config/rofi/scripts/clipboard.sh              # copy mode
+~/.config/rofi/scripts/clipboard.sh --delete      # delete mode
+```
+
+- Lists recent entries from cliphist
+- Copy mode (`SUPER + V`): copies selected entry to clipboard
+- Delete mode (`SUPER + SHIFT + V`): removes entry
+- Starts cliphist store daemon if not running
+
+### `script_wallpaper.sh`
+
+Legacy single-column wallpaper picker (grid theme, awww transitions). Installs to `~/.config/rofi/launchers/type-6/` integration.
+
+## Script Conventions
+
+- **Debounce mechanism** — Atomic `mkdir` to prevent double-firing (Hyprland sometimes fires keybinds twice)
+- **Cross-type guards** — `pgrep -x wf-recorder` prevents overlapping recording types
+- **Notifications** — All actions send desktop notifications via `notify-send`

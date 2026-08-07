@@ -37,9 +37,9 @@ All keyboard shortcuts for bitzdots. Modifiers:
 | Keybinding | Action |
 |---|---|
 | `SUPER + T` | Open terminal (kitty) |
-| `SUPER + E` | Open file manager (dolphin) |
+| `SUPER + E` | Open file manager (nautilus) |
 | `SUPER + W` | Open browser (Brave) |
-| `SUPER + C` | Open VS Code |
+| `SUPER + C` | Open Chromium |
 | `SUPER + Space` | App launcher (rofi) |
 | `SUPER + SHIFT + Space` | Alternate launcher (wofi) |
 

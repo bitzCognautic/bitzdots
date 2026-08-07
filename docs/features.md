@@ -31,7 +31,7 @@ The core feature. Every component derives its colors from your current wallpaper
 
 ## 2. Waybar Status Bar
 
-Top-mounted, 26px height status bar with 10+ custom modules:
+Top-mounted, 26px height status bar with 15 modules:
 
 - **Workspaces** — Batch display (5 at a time, centered on active). Click to focus, scroll to cycle
 - **Runcat** — CPU activity animation (Python-based)
@@ -51,7 +51,7 @@ Top-mounted, 26px height status bar with 10+ custom modules:
 
 ## 3. Keyboard-Driven Interface
 
-30+ keybindings for mouse-free operation. See [Keybindings](keybindings.md) for the full list.
+55+ keybindings for mouse-free operation. See [Keybindings](keybindings.md) for the full list.
 
 ## 4. Rofi Menus
 

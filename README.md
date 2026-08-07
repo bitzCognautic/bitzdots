@@ -43,9 +43,9 @@ Built for **low-end hardware** without sacrificing usability. The full stack (Hy
 - **🎨 Full-stack auto-theming** — One wallpaper change propagates to 20+ components via wallust (waybar, kitty, rofi, swaync, wlogout, cava, Hyprland borders, Qt/KDE, GTK, even browser CSS)
 - **⚡ Event-driven cache daemon** — inotify-based background pre-generation means wallpaper switching is instant, not sluggish
 - **🖼 Live wallpaper support** — Static images with animated transitions (`awww`) and video wallpapers (`mpvpaper`) with automatic palette extraction
-- **🧩 25 Jinja2 templates** — Every themed component uses a template. Colors are consistent everywhere
+- **🧩 25 Jinja2 templates** — Every themed component (including launcher, power, wallpaper-grid themes and 8 SVG icons) uses a template. Colors are consistent everywhere
 - **🔧 Rofi-powered everything** — App launcher, clipboard manager (cliphist), power menu, wallpaper picker (grid with thumbnails), WiFi, Bluetooth, audio, system monitor — all keyboard-navigable
-- **🖥 Waybar with 10+ custom modules** — Workspace batch display, live media, recording indicator, brightness, power profiles, notification center toggle, system TUIs
+- **🖥 Waybar with 15 modules** — Workspace batch display, runcat CPU animation, live media, recording indicator, brightness, power profiles, notification center toggle, system TUIs
 - **🔒 Full-screen + region recording** — wf-recorder with audio, start/stop toggle keybinds, saves to organized directories
 - **📸 Screenshots with clipboard** — Fullscreen (Print) and selection (SUPER+SHIFT+S) both save AND copy to clipboard
 - **🐟 Fish shell + fastfetch** — Minimal greeting-less shell, custom BITZ ASCII logo on startup
@@ -82,6 +82,8 @@ See the **[Getting Started guide](docs/getting-started.md)** for a full walkthro
 | `SUPER + R` | Toggle screen recording |
 | `SUPER + SHIFT + W` | Wallpaper picker |
 | `SUPER + N` | Toggle notifications |
+| `SUPER + P` | Power menu |
+| `SUPER + L` | Lock screen |
 
 Full reference: **[docs/keybindings.md](docs/keybindings.md)**
 
@@ -106,7 +108,7 @@ Full reference: **[docs/keybindings.md](docs/keybindings.md)**
 ~/.config/
 ├── hypr/              # Hyprland (Lua config)
 │   ├── hyprland.lua   # Entry point
-│   ├── keybinds.lua   # 30+ keybinds
+│   ├── keybinds.lua   # 55+ keybinds
 │   ├── appearance.lua # Blur, opacity, borders
 │   ├── animations.lua # Window animations
 │   ├── rules.lua      # 20+ window rules
@@ -114,11 +116,12 @@ Full reference: **[docs/keybindings.md](docs/keybindings.md)**
 │   ├── input.lua      # Keyboard, mouse, touchpad
 │   └── autostart.lua  # Startup applications
 ├── waybar/            # Status bar
-│   ├── config.jsonc   # Module layout (themed)
+│   ├── config.jsonc   # Module layout (themed, 15 modules)
 │   ├── style.css      # Styling (themed)
 │   └── scripts/       # 17 custom scripts
 ├── rofi/              # App launcher & menus
-│   ├── themes/        # 24+ variants
+│   ├── themes/        # 27 variants
+│   ├── icons/         # 8 themed SVG icons
 │   ├── scripts/       # Power, clipboard, wallpaper
 │   └── config.rasi    # Main config
 ├── swaync/            # Notification center
@@ -128,7 +131,7 @@ Full reference: **[docs/keybindings.md](docs/keybindings.md)**
 ├── wallust/           # Theming engine (25 templates)
 ├── fish/              # Fish shell config
 ├── fastfetch/         # System fetch (custom logo)
-└── scripts/           # 8 utility scripts
+└── scripts/           # 10 utility scripts
 ```
 
 ## Performance
@@ -152,7 +155,7 @@ Wallpaper image
     ↓ wallust (fastresize backend)
 16-color palette
     ↓ 25 Jinja2 templates
-Config files for every component
+Config files for every component (20+ files)
     ↓ reload-theme.sh
 All apps pick up new colors instantly
 ```
