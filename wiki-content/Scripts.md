@@ -109,6 +109,17 @@ Background helper that pushes instant waybar workspace updates on Hyprland works
 
 Wrapper used by the power menu / wlogout to exit Hyprland cleanly.
 
+### `wifi-fix.sh`
+
+Boot-time WiFi stabilizer, run from `hypr/autostart.lua` shortly after login.
+
+- Waits for NetworkManager to appear on D-Bus (up to 30s)
+- Unblocks the WiFi radio (`rfkill unblock wifi`, `nmcli radio wifi on`)
+- Waits for an active connection, then reactivates saved connections if needed
+- Retries with a radio toggle if still offline
+
+Fixes the boot-time "strikethrough WiFi" waybar icon and impala crashes when NetworkManager isn't ready yet.
+
 ## Waybar Scripts (`waybar/scripts/`)
 
 17 scripts powering the waybar custom modules:
@@ -125,7 +136,7 @@ Wrapper used by the power menu / wlogout to exit Hyprland cleanly.
 | `system-power.sh` | Rofi power menu (Lock/Logout/Sleep/Reboot/Shutdown) |
 | `tui-audio.sh` | Opens pulsemixer in floating kitty |
 | `tui-bluetooth.sh` | Opens bluetui in floating kitty |
-| `tui-wifi.sh` | Opens impala in floating kitty |
+| `tui-wifi.sh` | Waits for NetworkManager, then opens impala in floating kitty |
 | `tui-cpu.sh` | Opens btop in floating kitty |
 | `weather.sh` | Weather from wttr.in (30-min cache) |
 | `workspaces.sh` | Batch workspace display (5 at a time) |

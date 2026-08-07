@@ -12,6 +12,10 @@ hl.on("hyprland.start", function()
     -- Workspace event monitor for instant waybar updates
     hl.exec_cmd("bash -c '~/.config/waybar/scripts/workspace-monitor.sh &'")
 
+    -- Ensure WiFi is up: wait for NetworkManager, then reconnect if needed.
+    -- Prevents the "strikethrough WiFi" waybar icon and impala crashes on boot.
+    hl.exec_cmd("bash -c 'sleep 3 && ~/.config/wallust/wifi-fix.sh &'")
+
     -- Wallust palette cache daemon runs as a systemd user service
     -- (wallust-cache-daemon.service) — no need to start it here
 

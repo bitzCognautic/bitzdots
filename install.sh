@@ -238,7 +238,7 @@ install_scripts() {
     local scripts_dir="$CONFIG_DIR/wallust"
     mkdir -p "$scripts_dir/templates"
 
-    for s in reload-theme.sh wallpaper-select.sh cache-wallpapers.sh wallust-cache-daemon.sh record-fullscreen.sh record-region.sh recording-indicator.sh; do
+    for s in reload-theme.sh wallpaper-select.sh cache-wallpapers.sh wallust-cache-daemon.sh record-fullscreen.sh record-region.sh recording-indicator.sh wifi-fix.sh; do
         ln -sf "$DOTFILES_DIR/scripts/$s" "$scripts_dir/$s"
     done
 
@@ -457,6 +457,16 @@ install_systemd_services() {
         else
             warn "bluetooth.service unit not found — try reinstalling bluez"
         fi
+    fi
+
+    # Enable NetworkManager so WiFi reliably auto-connects on boot
+    if systemctl list-unit-files NetworkManager.service &>/dev/null; then
+        sudo systemctl enable --now NetworkManager.service 2>/dev/null || \
+            warn "Could not enable NetworkManager.service — WiFi may not auto-connect"
+        sudo systemctl start NetworkManager.service 2>/dev/null || true
+        ok "NetworkManager service enabled"
+    else
+        warn "NetworkManager.service unit not found — WiFi TUI (impala) requires it"
     fi
 }
 
