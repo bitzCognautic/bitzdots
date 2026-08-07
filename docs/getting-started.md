@@ -12,7 +12,7 @@ Quick start guide for first-time bitzdots users.
 ## One-Command Install
 
 ```bash
-git clone https://github.com/bitzCognautic/bitzdots.git ~/.config/bitzdots
+git clone https://github.com/bitzzdev/bitzdots.git ~/.config/bitzdots
 cd ~/.config/bitzdots
 chmod +x install.sh
 ./install.sh --with-deps

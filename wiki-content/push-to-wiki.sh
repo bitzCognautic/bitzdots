@@ -2,11 +2,11 @@
 set -euo pipefail
 
 DIR="$(dirname "$(readlink -f "$0")")"
-WIKI_URL="https://github.com/bitzCognautic/bitzdots.wiki.git"
+WIKI_URL="https://github.com/bitzzdev/bitzdots.wiki.git"
 
 echo "This script pushes prepared wiki content to the GitHub wiki."
 echo ""
-echo "Prerequisite: Visit https://github.com/bitzCognautic/bitzdots/wiki"
+echo "Prerequisite: Visit https://github.com/bitzzdev/bitzdots/wiki"
 echo "and click 'Create the first page' (save a minimal page)."
 echo ""
 read -rp "Have you created the first wiki page? (y/N): " CONFIRM

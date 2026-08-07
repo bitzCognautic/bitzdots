@@ -11,7 +11,7 @@
 Clone the repository and run the install script:
 
 ```bash
-git clone https://github.com/bitzCognautic/bitzdots.git ~/.config
+git clone https://github.com/bitzzdev/bitzdots.git ~/.config
 chmod +x ~/.config/scripts/install.sh
 ~/.config/scripts/install.sh
 ```
@@ -55,7 +55,7 @@ The install script will:
 ### 2. Clone Configs
 
 ```bash
-git clone https://github.com/bitzCognautic/bitzdots.git ~/.config/bitzdots
+git clone https://github.com/bitzzdev/bitzdots.git ~/.config/bitzdots
 ln -sf ~/.config/bitzdots/* ~/.config/
 ```
 

@@ -5,7 +5,7 @@
 ## Quick Start
 
 ```bash
-git clone https://github.com/bitzCognautic/bitzdots.git ~/.config
+git clone https://github.com/bitzzdev/bitzdots.git ~/.config
 chmod +x ~/.config/scripts/install.sh
 ~/.config/scripts/install.sh
 ```
